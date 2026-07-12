@@ -22,7 +22,7 @@ scripts/                → seed, API smoke tests, baseline helpers
 |-------|-------------|
 | Backend | Python monorepo |
 | Database | Supabase (`prompts`, `raw_runs`, `run_batches`, `brand_config`, `scores`) |
-| AI engines | OpenAI (`gpt-4o-mini`) + Gemini (`gemini-2.0-flash`) |
+| AI engines | OpenAI (`gpt-5-mini`) + Gemini (`gemini-2.5-flash`) |
 | Orchestration | Sequential Python worker + Cron |
 | Ops UI | Streamlit health dashboard |
 
@@ -52,7 +52,21 @@ pip install -e ".[dev]"
 
 ```bash
 cp .env.example .env
-# Fill in OPENAI_API_KEY, GEMINI_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+```
+
+Edit `.env` and add your keys (required before any live runs):
+
+| Variable | Required for | Where to get it |
+|----------|--------------|-----------------|
+| `OPENAI_API_KEY` | OpenAI prompt runs | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
+| `GEMINI_API_KEY` | Gemini prompt runs | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
+| `SUPABASE_URL` | Pipeline + dashboard | Supabase project → Settings → API |
+| `SUPABASE_SERVICE_ROLE_KEY` | Pipeline + dashboard | Same page (service role, server-side only) |
+
+Check readiness:
+
+```bash
+python scripts/check_ready.py
 ```
 
 ### 3. Apply Supabase schema
@@ -75,12 +89,26 @@ python scripts/seed_supabase.py
 python scripts/test_api_keys.py
 ```
 
-## Running Phase 1
+## Bulk testing prompts (no Supabase required)
+
+Smoke-test API keys, then run prompts from the local JSON library and save results to disk:
+
+```bash
+python scripts/check_ready.py          # confirms keys are set
+python scripts/test_api_keys.py        # one prompt per engine
+python scripts/bulk_prompt_test.py --limit 3   # quick test (3 prompts × engines)
+python scripts/bulk_prompt_test.py             # full 25 prompts × engines
+```
+
+Results are written to `data/runs/bulk_test_<timestamp>.json`.
+
+## Running Phase 1 (with Supabase)
 
 ### Manual pipeline run
 
 ```bash
 python -m agents.prompt_runner.pipeline
+python -m agents.prompt_runner.pipeline --limit 3   # first 3 prompts only (testing)
 ```
 
 ### Cron scheduler (daily 6 AM UTC)

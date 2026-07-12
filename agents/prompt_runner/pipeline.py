@@ -80,7 +80,7 @@ def build_adapters(settings: Settings | None = None) -> list[EngineAdapter]:
     return adapters
 
 
-def run_pipeline(settings: Settings | None = None) -> uuid.UUID:
+def run_pipeline(settings: Settings | None = None, prompt_limit: int | None = None) -> uuid.UUID:
     cfg = settings or get_settings()
     client = get_supabase_client(cfg)
     adapters = build_adapters(cfg)
@@ -99,6 +99,8 @@ def run_pipeline(settings: Settings | None = None) -> uuid.UUID:
     client.table("run_batches").insert(batch_row).execute()
 
     prompts = load_active_prompts(cfg.brand_id, cfg)
+    if prompt_limit is not None:
+        prompts = prompts[:prompt_limit]
     daily_cost = get_daily_cost_so_far(cfg)
     success_count = 0
     failure_count = 0
@@ -198,5 +200,20 @@ def main() -> None:
     run_pipeline()
 
 
+def cli_main() -> None:
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Run prompt pipeline against Supabase")
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=None,
+        help="Run only the first N active prompts (for testing)",
+    )
+    args = parser.parse_args()
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    run_pipeline(prompt_limit=args.limit)
+
+
 if __name__ == "__main__":
-    main()
+    cli_main()
