@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import google.generativeai as genai
+from google import genai
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from agents.prompt_runner.adapters.base import EngineAdapter
@@ -17,19 +17,23 @@ class GeminiAdapter:
         self._settings = settings or get_settings()
         if not self._settings.gemini_api_key:
             raise ValueError("GEMINI_API_KEY is not set")
-        genai.configure(api_key=self._settings.gemini_api_key)
+        self._client = genai.Client(api_key=self._settings.gemini_api_key)
         self._model = self._settings.gemini_model
-        self._client = genai.GenerativeModel(self._model)
         self._limiter = TokenBucketRateLimiter(self._settings.rate_limit_rpm)
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=8))
     def complete(self, prompt: str) -> NormalizedResponse:
         self._limiter.acquire()
-        response = self._client.generate_content(prompt)
+        response = self._client.models.generate_content(
+            model=self._model,
+            contents=prompt,
+        )
         text = response.text or ""
         usage = response.usage_metadata
-        tokens_in = usage.prompt_token_count if usage else 0
-        tokens_out = usage.candidates_token_count if usage else 0
+        tokens_in = usage.prompt_token_count if usage and usage.prompt_token_count else 0
+        tokens_out = (
+            usage.candidates_token_count if usage and usage.candidates_token_count else 0
+        )
         raw = {
             "model": self._model,
             "text": text,

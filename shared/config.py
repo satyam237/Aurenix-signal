@@ -11,8 +11,8 @@ class Settings(BaseSettings):
     supabase_url: str = ""
     supabase_service_role_key: str = ""
 
-    openai_model: str = "gpt-4o-mini"
-    gemini_model: str = "gemini-2.0-flash"
+    openai_model: str = "gpt-5-mini"
+    gemini_model: str = "gemini-2.5-flash"
 
     daily_cost_cap_usd: float = 10.0
     cron_hour_utc: int = 6

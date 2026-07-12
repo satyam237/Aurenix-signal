@@ -22,6 +22,8 @@ REQUIRED_PATHS = [
     "dashboard/health_app.py",
     "scripts/seed_supabase.py",
     "scripts/test_api_keys.py",
+    "scripts/check_ready.py",
+    "scripts/bulk_prompt_test.py",
 ]
 
 
@@ -94,9 +96,11 @@ def main() -> int:
             "      Apply supabase/migrations/001_initial_schema.sql then run scripts/seed_supabase.py"
         )
 
-    print("\nRun unit tests: pytest -q")
+    print("\nRun readiness check: python scripts/check_ready.py")
+    print("Run unit tests: pytest -q")
     print("Run API smoke test: python scripts/test_api_keys.py")
-    print("Run pipeline: python -m agents.prompt_runner.pipeline")
+    print("Bulk test (local): python scripts/bulk_prompt_test.py --limit 3")
+    print("Run pipeline: python -m agents.prompt_runner.pipeline --limit 3")
     print("Run health dashboard: streamlit run dashboard/health_app.py")
 
     return 0 if ok else 1

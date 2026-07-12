@@ -2,7 +2,9 @@ from __future__ import annotations
 
 # USD per 1M tokens (input, output) — update as provider pricing changes
 MODEL_PRICING: dict[str, tuple[float, float]] = {
+    "gpt-5-mini": (0.25, 2.00),
     "gpt-4o-mini": (0.15, 0.60),
+    "gemini-2.5-flash": (0.15, 0.60),
     "gemini-2.0-flash": (0.10, 0.40),
 }
 
