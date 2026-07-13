@@ -18,10 +18,10 @@ REQUIRED_PATHS = [
     "data/brands/nautikal_truth_registry.json",
     "data/baseline/week0_baseline.csv",
     "supabase/migrations/001_initial_schema.sql",
-    "agents/prompt_runner/pipeline.py",
-    "agents/prompt_runner/adapters/openai_adapter.py",
-    "agents/prompt_runner/adapters/gemini_adapter.py",
-    "scheduler/cron_runner.py",
+    "backend/agents/prompt_runner/pipeline.py",
+    "backend/agents/prompt_runner/adapters/openai_adapter.py",
+    "backend/agents/prompt_runner/adapters/gemini_adapter.py",
+    "backend/scheduler/cron_runner.py",
     "dashboard/health_app.py",
     "scripts/seed_supabase.py",
     "scripts/test_api_keys.py",
@@ -46,8 +46,8 @@ def check_prompts() -> list[str]:
 
 
 def check_supabase_connection() -> tuple[bool, str]:
-    from shared.config import get_settings
-    from shared.supabase_client import get_supabase_client
+    from backend.shared.config import get_settings
+    from backend.shared.supabase_client import get_supabase_client
 
     settings = get_settings()
     if not settings.supabase_url or not settings.supabase_service_role_key:
@@ -103,7 +103,7 @@ def main() -> int:
     print("Run unit tests: pytest -q")
     print("Run API smoke test: python scripts/test_api_keys.py")
     print("Bulk test (local): python scripts/bulk_prompt_test.py --limit 3")
-    print("Run pipeline: python -m agents.prompt_runner.pipeline --limit 3")
+    print("Run pipeline: python -m backend.agents.prompt_runner.pipeline --limit 3")
     print("Run health dashboard: streamlit run dashboard/health_app.py")
 
     return 0 if ok else 1

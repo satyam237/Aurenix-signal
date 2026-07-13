@@ -3,11 +3,11 @@ from __future__ import annotations
 from google import genai
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from agents.prompt_runner.adapters.base import EngineAdapter
-from shared.config import Settings, get_settings
-from shared.models import NormalizedResponse
-from shared.pricing import estimate_cost_usd
-from shared.rate_limiter import TokenBucketRateLimiter
+from backend.agents.prompt_runner.adapters.base import EngineAdapter
+from backend.shared.config import Settings, get_settings
+from backend.shared.models import NormalizedResponse
+from backend.shared.pricing import estimate_cost_usd
+from backend.shared.rate_limiter import TokenBucketRateLimiter
 
 
 class GeminiAdapter:

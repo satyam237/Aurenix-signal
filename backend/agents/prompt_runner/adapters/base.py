@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from shared.models import NormalizedResponse
+from backend.shared.models import NormalizedResponse
 
 
 class EngineAdapter(Protocol):

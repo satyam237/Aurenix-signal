@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 
-from shared.rate_limiter import TokenBucketRateLimiter
+from backend.shared.rate_limiter import TokenBucketRateLimiter
 
 
 def test_token_bucket_acquires_without_error() -> None:

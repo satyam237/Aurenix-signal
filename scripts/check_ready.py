@@ -28,7 +28,7 @@ def main() -> int:
         print("  Then edit .env and paste your API keys.\n")
         return 1
 
-    from shared.config import get_settings
+    from backend.shared.config import get_settings
 
     settings = get_settings()
     ready_for_api = True
@@ -83,7 +83,7 @@ def main() -> int:
         print("\nFor Supabase pipeline runs, also set SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY,")
         print("apply supabase/migrations/001_initial_schema.sql, then:")
         print("  python scripts/seed_supabase.py")
-        print("  python -m agents.prompt_runner.pipeline --limit 3")
+        print("  python -m backend.agents.prompt_runner.pipeline --limit 3")
 
     return 0
 

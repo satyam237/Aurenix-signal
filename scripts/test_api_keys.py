@@ -10,9 +10,9 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from agents.prompt_runner.adapters.gemini_adapter import build_gemini_adapter
-from agents.prompt_runner.adapters.openai_adapter import build_openai_adapter
-from shared.config import get_settings
+from backend.agents.prompt_runner.adapters.gemini_adapter import build_gemini_adapter
+from backend.agents.prompt_runner.adapters.openai_adapter import build_openai_adapter
+from backend.shared.config import get_settings
 
 TEST_PROMPT = "Reply with exactly: API key OK"
 

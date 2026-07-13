@@ -5,8 +5,8 @@ from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 
-from agents.prompt_runner.adapters.base import EngineAdapter
-from shared.models import NormalizedResponse
+from backend.agents.prompt_runner.adapters.base import EngineAdapter
+from backend.shared.models import NormalizedResponse
 
 
 @dataclass(frozen=True)

@@ -9,13 +9,16 @@ AI Discovery Optimization (GEO) platform that measures how brands appear in AI e
 ## Architecture
 
 ```
-agents/prompt_runner/   → Phase 1: automated prompt execution
-shared/                 → config, Supabase client, models, pricing
-scheduler/              → Cron entry point
-dashboard/              → Streamlit health dashboard (Phase 1)
-data/                   → prompts, truth registry, baseline CSV
-supabase/migrations/    → database schema
-scripts/                → seed, API smoke tests, baseline helpers
+backend/agents/prompt_runner/  → Phase 1: automated prompt execution
+backend/shared/                → config, Supabase client, models, pricing
+backend/scheduler/             → Cron entry point
+dashboard/                     → Streamlit health dashboard (Phase 1)
+data/                          → prompts, truth registry, baseline CSV
+docs/                          → roadmap and reference documents
+experiments/                   → ad-hoc experiments and analysis
+supabase/migrations/           → database schema
+scripts/                       → seed, API smoke tests, baseline helpers
+tests/                         → pytest suite
 ```
 
 | Layer | v1.0 Choice |
@@ -36,7 +39,7 @@ scripts/                → seed, API smoke tests, baseline helpers
 | 3 | GEO Dashboard MVP |
 | 4 | GEO Recommender + before/after loop |
 
-Full roadmap: [`data/pdf/AureniX_Signal_Roadmap_Updated.pdf`](data/pdf/AureniX_Signal_Roadmap_Updated.pdf)
+Full roadmap: [`docs/AureniX_Signal_Roadmap_Updated.pdf`](docs/AureniX_Signal_Roadmap_Updated.pdf)
 
 ## Setup
 
@@ -116,20 +119,20 @@ Results are written to `data/runs/bulk_test_<timestamp>.json`. Partial progress 
 ### Manual pipeline run
 
 ```bash
-python -m agents.prompt_runner.pipeline
-python -m agents.prompt_runner.pipeline --limit 3   # first 3 prompts only (testing)
+python -m backend.agents.prompt_runner.pipeline
+python -m backend.agents.prompt_runner.pipeline --limit 3   # first 3 prompts only (testing)
 ```
 
 ### Cron scheduler (daily 6 AM UTC)
 
 ```bash
-python -m scheduler.cron_runner
+python -m backend.scheduler.cron_runner
 ```
 
 Local crontab example:
 
 ```
-0 6 * * * cd /path/to/GEO-Ranker-Signal-15June && .venv/bin/python -m scheduler.cron_runner
+0 6 * * * cd /path/to/aurenix-signal && .venv/bin/python -m backend.scheduler.cron_runner
 ```
 
 ### Health dashboard
@@ -155,14 +158,18 @@ streamlit run dashboard/health_app.py
 ## Project structure
 
 ```
-GEO-Ranker-Signal-15June/
-├── agents/prompt_runner/
-│   ├── pipeline.py
-│   └── adapters/
-├── shared/
-├── scheduler/
+aurenix-signal/
+├── backend/
+│   ├── agents/prompt_runner/
+│   │   ├── pipeline.py
+│   │   └── adapters/
+│   ├── shared/
+│   └── scheduler/
 ├── dashboard/
 ├── data/
+├── docs/
+├── experiments/
 ├── supabase/migrations/
-└── scripts/
+├── scripts/
+└── tests/
 ```

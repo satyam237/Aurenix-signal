@@ -11,8 +11,8 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from shared.config import get_settings
-from shared.supabase_client import get_supabase_client
+from backend.shared.config import get_settings
+from backend.shared.supabase_client import get_supabase_client
 
 PROMPTS_PATH = ROOT / "data" / "prompts" / "nautikal_prompts.json"
 TRUTH_PATH = ROOT / "data" / "brands" / "nautikal_truth_registry.json"

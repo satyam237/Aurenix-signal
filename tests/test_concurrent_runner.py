@@ -6,13 +6,13 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from shared.concurrent_runner import (
+from backend.shared.concurrent_runner import (
     PromptTask,
     TaskResult,
     run_tasks_concurrently,
     task_result_to_bulk_row,
 )
-from shared.models import NormalizedResponse
+from backend.shared.models import NormalizedResponse
 
 
 class SlowAdapter:

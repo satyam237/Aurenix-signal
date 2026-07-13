@@ -4,8 +4,8 @@ import logging
 import sys
 from datetime import datetime, timezone
 
-from agents.prompt_runner.pipeline import run_pipeline
-from shared.config import get_settings
+from backend.agents.prompt_runner.pipeline import run_pipeline
+from backend.shared.config import get_settings
 
 logger = logging.getLogger(__name__)
 

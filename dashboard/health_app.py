@@ -4,8 +4,8 @@ from datetime import datetime, timedelta, timezone
 
 import streamlit as st
 
-from shared.config import get_settings
-from shared.supabase_client import get_supabase_client
+from backend.shared.config import get_settings
+from backend.shared.supabase_client import get_supabase_client
 
 st.set_page_config(page_title="Signal Health", page_icon="📡", layout="wide")
 st.title("AureniX Signal — Prompt Runner Health")
@@ -92,7 +92,7 @@ if last_batch:
         }
     )
 else:
-    st.info("No batches yet. Run: `python -m agents.prompt_runner.pipeline`")
+    st.info("No batches yet. Run: `python -m backend.agents.prompt_runner.pipeline`")
 
 st.subheader("Recent batches")
 if batches:

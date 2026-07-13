@@ -6,14 +6,14 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from agents.prompt_runner.adapters.base import EngineAdapter
-from agents.prompt_runner.adapters.gemini_adapter import build_gemini_adapter
-from agents.prompt_runner.adapters.openai_adapter import build_openai_adapter
-from shared.brand_context import build_brand_system_prompt
-from shared.concurrent_runner import PromptTask, TaskResult, run_tasks_concurrently
-from shared.config import Settings, get_settings
-from shared.models import PromptRecord
-from shared.supabase_client import get_supabase_client
+from backend.agents.prompt_runner.adapters.base import EngineAdapter
+from backend.agents.prompt_runner.adapters.gemini_adapter import build_gemini_adapter
+from backend.agents.prompt_runner.adapters.openai_adapter import build_openai_adapter
+from backend.shared.brand_context import build_brand_system_prompt
+from backend.shared.concurrent_runner import PromptTask, TaskResult, run_tasks_concurrently
+from backend.shared.config import Settings, get_settings
+from backend.shared.models import PromptRecord
+from backend.shared.supabase_client import get_supabase_client
 
 logger = logging.getLogger(__name__)
 

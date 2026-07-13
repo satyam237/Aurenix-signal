@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from scripts.bulk_prompt_test import run_bulk
-from shared.concurrent_runner import PromptTask, TaskResult
+from backend.shared.concurrent_runner import PromptTask, TaskResult
 
 
 def _mock_task_result(prompt_id: str, engine: str, sort_index: int) -> TaskResult:

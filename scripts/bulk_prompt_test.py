@@ -14,14 +14,14 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from agents.prompt_runner.pipeline import build_adapters
-from shared.brand_context import build_brand_system_prompt
-from shared.concurrent_runner import (
+from backend.agents.prompt_runner.pipeline import build_adapters
+from backend.shared.brand_context import build_brand_system_prompt
+from backend.shared.concurrent_runner import (
     PromptTask,
     run_tasks_concurrently,
     task_result_to_bulk_row,
 )
-from shared.config import get_settings
+from backend.shared.config import get_settings
 
 PROMPTS_PATH = ROOT / "data" / "prompts" / "nautikal_prompts.json"
 RUNS_DIR = ROOT / "data" / "runs"

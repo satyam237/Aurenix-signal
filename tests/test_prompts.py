@@ -41,7 +41,7 @@ def test_neutral_prompt_backup_exists() -> None:
 
 
 def test_brand_system_prompt_contents() -> None:
-    from shared.brand_context import build_brand_system_prompt
+    from backend.shared.brand_context import build_brand_system_prompt
 
     system = build_brand_system_prompt()
     assert "The Nautikal" in system

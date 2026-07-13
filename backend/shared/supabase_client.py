@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from supabase import Client, create_client
 
-from shared.config import Settings, get_settings
+from backend.shared.config import Settings, get_settings
 
 
 def get_supabase_client(settings: Settings | None = None) -> Client:
