@@ -22,18 +22,18 @@ class GeminiAdapter:
         self._limiter = TokenBucketRateLimiter(self._settings.rate_limit_rpm)
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=8))
-    def complete(self, prompt: str) -> NormalizedResponse:
+    def complete(self, prompt: str, system: str | None = None) -> NormalizedResponse:
         self._limiter.acquire()
+        config = genai.types.GenerateContentConfig(system_instruction=system) if system else None
         response = self._client.models.generate_content(
             model=self._model,
             contents=prompt,
+            config=config,
         )
         text = response.text or ""
         usage = response.usage_metadata
         tokens_in = usage.prompt_token_count if usage and usage.prompt_token_count else 0
-        tokens_out = (
-            usage.candidates_token_count if usage and usage.candidates_token_count else 0
-        )
+        tokens_out = usage.candidates_token_count if usage and usage.candidates_token_count else 0
         raw = {
             "model": self._model,
             "text": text,

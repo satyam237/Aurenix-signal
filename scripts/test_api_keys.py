@@ -4,6 +4,11 @@
 from __future__ import annotations
 
 import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from agents.prompt_runner.adapters.gemini_adapter import build_gemini_adapter
 from agents.prompt_runner.adapters.openai_adapter import build_openai_adapter

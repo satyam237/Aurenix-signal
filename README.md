@@ -22,7 +22,7 @@ scripts/                → seed, API smoke tests, baseline helpers
 |-------|-------------|
 | Backend | Python monorepo |
 | Database | Supabase (`prompts`, `raw_runs`, `run_batches`, `brand_config`, `scores`) |
-| AI engines | OpenAI (`gpt-5-mini`) + Gemini (`gemini-2.5-flash`) |
+| AI engines | OpenAI (`gpt-5-mini`) + Gemini (`gemini-3-flash-preview`) |
 | Orchestration | Sequential Python worker + Cron |
 | Ops UI | Streamlit health dashboard |
 
@@ -96,11 +96,20 @@ Smoke-test API keys, then run prompts from the local JSON library and save resul
 ```bash
 python scripts/check_ready.py          # confirms keys are set
 python scripts/test_api_keys.py        # one prompt per engine
-python scripts/bulk_prompt_test.py --limit 3   # quick test (3 prompts × engines)
-python scripts/bulk_prompt_test.py             # full 25 prompts × engines
+python scripts/bulk_prompt_test.py --limit 3              # quick test (3 prompts × engines)
+python scripts/bulk_prompt_test.py --concurrency 6        # full run, parallel (~4-5 min)
+python scripts/bulk_prompt_test.py --concurrency 2        # conservative parallelism
+python scripts/bulk_prompt_test.py --sequential           # one call at a time (debug)
+python scripts/bulk_prompt_test.py --no-brand-context     # neutral mode (no brand grounding)
 ```
 
-Results are written to `data/runs/bulk_test_<timestamp>.json`.
+By default, runs inject a brand-grounding system prompt built from
+`data/brands/nautikal_truth_registry.json` so engines answer with verified
+Nautikal facts. Prompts in `data/prompts/nautikal_prompts.json` are brand-steered;
+the original neutral prompt set is preserved in
+`data/prompts/nautikal_prompts_neutral.json` for baseline measurement.
+
+Results are written to `data/runs/bulk_test_<timestamp>.json`. Partial progress is checkpointed every 5 completions to `*.partial.json`.
 
 ## Running Phase 1 (with Supabase)
 

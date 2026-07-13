@@ -4,12 +4,16 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from shared.config import get_settings
 from shared.supabase_client import get_supabase_client
 
-ROOT = Path(__file__).resolve().parent.parent
 PROMPTS_PATH = ROOT / "data" / "prompts" / "nautikal_prompts.json"
 TRUTH_PATH = ROOT / "data" / "brands" / "nautikal_truth_registry.json"
 

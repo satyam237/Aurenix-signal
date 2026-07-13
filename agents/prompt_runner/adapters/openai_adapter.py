@@ -22,11 +22,15 @@ class OpenAIAdapter:
         self._limiter = TokenBucketRateLimiter(self._settings.rate_limit_rpm)
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=8))
-    def complete(self, prompt: str) -> NormalizedResponse:
+    def complete(self, prompt: str, system: str | None = None) -> NormalizedResponse:
         self._limiter.acquire()
+        messages: list[dict[str, str]] = []
+        if system:
+            messages.append({"role": "system", "content": system})
+        messages.append({"role": "user", "content": prompt})
         response = self._client.chat.completions.create(
             model=self._model,
-            messages=[{"role": "user", "content": prompt}],
+            messages=messages,
         )
         choice = response.choices[0]
         text = choice.message.content or ""

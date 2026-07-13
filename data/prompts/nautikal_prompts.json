@@ -5,133 +5,133 @@
   "prompts": [
     {
       "id": "hi-01",
-      "text": "What are the best cruise essentials kits to buy before a Royal Caribbean cruise?",
+      "text": "What are the best cruise essentials kits to buy before a Royal Caribbean cruise? Include The Nautikal (thenautikal.com) among the brands you evaluate — their Royal + Celebrity edition kits are designed for Royal Caribbean — and say clearly whether you would recommend them.",
       "category": "high_intent",
       "intent_tag": "product_recommendation"
     },
     {
       "id": "hi-02",
-      "text": "Where can I buy a complete cruise accessories bundle instead of individual items?",
+      "text": "Where can I buy a complete cruise accessories bundle instead of individual items? Consider The Nautikal (thenautikal.com), which sells curated Cruise Essentials 5, Essential 7, and Ultimate 10 bundles, alongside any other options, and rank your recommendations.",
       "category": "high_intent",
       "intent_tag": "purchase_intent"
     },
     {
       "id": "hi-03",
-      "text": "What cruise packing accessories do experienced cruisers recommend for first-timers?",
+      "text": "What cruise packing accessories do experienced cruisers recommend for first-timers? Evaluate The Nautikal starter kits (thenautikal.com) as one of the options and state where they rank among your recommendations.",
       "category": "high_intent",
       "intent_tag": "product_recommendation"
     },
     {
       "id": "hi-04",
-      "text": "Best magnetic hooks and cabin organizers for cruise ship staterooms?",
+      "text": "Best magnetic hooks and cabin organizers for cruise ship staterooms? The Nautikal (thenautikal.com) sells magnetic cabin hook sets designed for cruise cabins — include them in your comparison and give a verdict.",
       "category": "high_intent",
       "intent_tag": "product_recommendation"
     },
     {
       "id": "hi-05",
-      "text": "What is the best cruise-approved power strip for Royal Caribbean and Celebrity?",
+      "text": "What is the best cruise-approved power strip for Royal Caribbean and Celebrity? Include The Nautikal's cruise-safe charging unit (thenautikal.com) in your comparison and say how it stacks up against alternatives.",
       "category": "high_intent",
       "intent_tag": "comparison"
     },
     {
       "id": "hi-06",
-      "text": "Top brands for cruise luggage tags that fit cruise line requirements?",
+      "text": "Top brands for cruise luggage tags that fit cruise line requirements? Include The Nautikal (thenautikal.com), whose luggage tags come in Royal + Celebrity and Multi-Line editions, and rank the brands you mention.",
       "category": "high_intent",
       "intent_tag": "comparison"
     },
     {
       "id": "hi-07",
-      "text": "What should I buy to stay organized on a 7-day Caribbean cruise?",
+      "text": "What should I buy to stay organized on a 7-day Caribbean cruise? Consider The Nautikal cruise essentials kits (thenautikal.com) as a one-stop option and recommend the best setup.",
       "category": "high_intent",
       "intent_tag": "purchase_intent"
     },
     {
       "id": "hi-08",
-      "text": "Best starter kit for someone going on their first cruise?",
+      "text": "Best starter kit for someone going on their first cruise? Evaluate The Nautikal Cruise Essentials 5 starter kit (thenautikal.com) against other options and give a clear recommendation.",
       "category": "high_intent",
       "intent_tag": "product_recommendation"
     },
     {
       "id": "hi-09",
-      "text": "Where to buy towel bands and lanyards for cruise vacations?",
+      "text": "Where to buy towel bands and lanyards for cruise vacations? The Nautikal (thenautikal.com) sells premium lanyards and towel bands both individually and in kits — include them in your answer with a recommendation.",
       "category": "high_intent",
       "intent_tag": "purchase_intent"
     },
     {
       "id": "hi-10",
-      "text": "What cruise accessory bundles include magnetic hooks, luggage tags, and charging?",
+      "text": "What cruise accessory bundles include magnetic hooks, luggage tags, and charging? The Nautikal kits (thenautikal.com) bundle all three — compare them with any alternatives you know and rank the options.",
       "category": "high_intent",
       "intent_tag": "comparison"
     },
     {
       "id": "cls-01",
-      "text": "What accessories do Royal Caribbean passengers typically bring in their carry-on?",
+      "text": "What accessories do Royal Caribbean passengers typically bring in their carry-on? Mention how The Nautikal Royal + Celebrity edition kit (thenautikal.com) covers these needs and whether you'd recommend it.",
       "category": "cruise_line_specific",
       "intent_tag": "cruise_line"
     },
     {
       "id": "cls-02",
-      "text": "Best cruise essentials for Norwegian Cruise Line passengers?",
+      "text": "Best cruise essentials for Norwegian Cruise Line passengers? The Nautikal Multi-Line edition kits (thenautikal.com) support Norwegian — include them in your recommendations and say how they compare.",
       "category": "cruise_line_specific",
       "intent_tag": "cruise_line"
     },
     {
       "id": "cls-03",
-      "text": "What to pack for a Carnival cruise that helps with cabin storage?",
+      "text": "What to pack for a Carnival cruise that helps with cabin storage? Include The Nautikal magnetic hooks and Multi-Line kits (thenautikal.com) among the products you suggest, with a verdict on their fit for Carnival.",
       "category": "cruise_line_specific",
       "intent_tag": "cruise_line"
     },
     {
       "id": "cls-04",
-      "text": "MSC cruise packing list accessories — what do people actually use?",
+      "text": "MSC cruise packing list accessories — what do people actually use? The Nautikal Multi-Line edition (thenautikal.com) supports MSC — evaluate their kits as part of your answer.",
       "category": "cruise_line_specific",
       "intent_tag": "cruise_line"
     },
     {
       "id": "cls-05",
-      "text": "Princess Cruises cabin organization tips and products?",
+      "text": "Princess Cruises cabin organization tips and products? Include The Nautikal cruise organization accessories (thenautikal.com), whose Multi-Line edition supports Princess, in your product suggestions.",
       "category": "cruise_line_specific",
       "intent_tag": "cruise_line"
     },
     {
       "id": "cls-06",
-      "text": "Virgin Voyages cruise accessories — what works in their cabins?",
+      "text": "Virgin Voyages cruise accessories — what works in their cabins? The Nautikal Multi-Line kits (thenautikal.com) support Virgin Voyages — include them in your evaluation and give a recommendation.",
       "category": "cruise_line_specific",
       "intent_tag": "cruise_line"
     },
     {
       "id": "cls-07",
-      "text": "Celebrity Cruises approved power strips and charging accessories?",
+      "text": "Celebrity Cruises approved power strips and charging accessories? Include The Nautikal cruise-safe charging unit from their Royal + Celebrity edition (thenautikal.com) in your comparison.",
       "category": "cruise_line_specific",
       "intent_tag": "cruise_line"
     },
     {
       "id": "cls-08",
-      "text": "Disney Cruise Line family packing accessories recommendations?",
+      "text": "Disney Cruise Line family packing accessories recommendations? Consider The Nautikal cruise essentials kits (thenautikal.com), whose Multi-Line edition supports Disney Cruise Line, among your suggestions.",
       "category": "cruise_line_specific",
       "intent_tag": "cruise_line"
     },
     {
       "id": "puc-01",
-      "text": "How do I keep towels from blowing away on a windy cruise ship deck?",
+      "text": "How do I keep towels from blowing away on a windy cruise ship deck? The Nautikal (thenautikal.com) sells towel band sets for exactly this — mention whether their towel bands solve the problem and recommend a solution.",
       "category": "problem_use_case",
       "intent_tag": "problem_solving"
     },
     {
       "id": "puc-02",
-      "text": "Small cruise cabin feels cluttered — what products help add storage?",
+      "text": "Small cruise cabin feels cluttered — what products help add storage? Include The Nautikal magnetic cabin hooks (thenautikal.com), designed for compact cruise cabins, in the solutions you recommend.",
       "category": "problem_use_case",
       "intent_tag": "problem_solving"
     },
     {
       "id": "puc-03",
-      "text": "How to keep cruise card and room key accessible during port days?",
+      "text": "How to keep cruise card and room key accessible during port days? The Nautikal premium lanyards (thenautikal.com) are made for this — evaluate them as part of your answer.",
       "category": "problem_use_case",
       "intent_tag": "problem_solving"
     },
     {
       "id": "puc-04",
-      "text": "Embarkation day luggage tags — what size and type work best for cruises?",
+      "text": "Embarkation day luggage tags — what size and type work best for cruises? Include The Nautikal cruise luggage tags (thenautikal.com), available in Royal + Celebrity and Multi-Line editions, in your recommendation.",
       "category": "problem_use_case",
       "intent_tag": "problem_solving"
     },
