@@ -6,6 +6,8 @@ AI Discovery Optimization (GEO) platform that measures how brands appear in AI e
 
 **Hypothesis (v1.0 MVP):** targeted content changes increase a brand's AI recommendation rate, measured by a composite **GEO Score**.
 
+**Project status:** Phases 0–1 complete — snapshot in [`STATUS.md`](STATUS.md), living work plan & progress log in [`PLAN.md`](PLAN.md). AI agent guidance: [`AGENTS.md`](AGENTS.md) / [`CLAUDE.md`](CLAUDE.md).
+
 ## Architecture
 
 ```
@@ -74,11 +76,15 @@ python scripts/check_ready.py
 
 ### 3. Apply Supabase schema
 
-Create a Supabase project, then run the migration in [`supabase/migrations/001_initial_schema.sql`](supabase/migrations/001_initial_schema.sql) via the Supabase SQL editor or CLI:
+See [`supabase/README.md`](supabase/README.md) for full details.
 
 ```bash
-supabase db push   # if using Supabase CLI linked to project
+python scripts/apply_schema.py --print-sql   # opens SQL editor instructions
+python scripts/apply_schema.py --check-only  # verify all 5 tables exist
+python scripts/setup_supabase.sh             # seed + smoke pipeline (after schema)
 ```
+
+Paste [`supabase/migrations/001_initial_schema.sql`](supabase/migrations/001_initial_schema.sql) into the Supabase SQL editor, or set `SUPABASE_DB_PASSWORD` in `.env` and run `python scripts/apply_schema.py --apply`.
 
 Seed prompts and brand config:
 
@@ -134,6 +140,18 @@ Local crontab example:
 ```
 0 6 * * * cd /path/to/aurenix-signal && .venv/bin/python -m backend.scheduler.cron_runner
 ```
+
+### GCP Cloud Run Jobs (recommended for production cron)
+
+Free-tier friendly: Cloud Scheduler (3 free jobs) + Cloud Run Jobs. See [`deploy/README.md`](deploy/README.md).
+
+```bash
+export GCP_PROJECT_ID=your-gcp-project-id
+./deploy/gcp_deploy.sh all    # secrets + deploy + daily 6 AM UTC schedule
+./deploy/gcp_deploy.sh run    # manual test execution
+```
+
+Requires [gcloud CLI](https://cloud.google.com/sdk/docs/install). Uses `Dockerfile` at repo root; secrets from `.env` via Secret Manager.
 
 ### Health dashboard
 
