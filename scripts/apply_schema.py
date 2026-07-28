@@ -21,8 +21,13 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-MIGRATION_PATH = ROOT / "supabase" / "migrations" / "001_initial_schema.sql"
+MIGRATIONS_DIR = ROOT / "supabase" / "migrations"
+MIGRATION_PATH = MIGRATIONS_DIR / "001_initial_schema.sql"
 REQUIRED_TABLES = ("prompts", "run_batches", "raw_runs", "brand_config", "scores")
+
+
+def _migration_files() -> list[Path]:
+    return sorted(MIGRATIONS_DIR.glob("*.sql"))
 
 
 def _project_ref(supabase_url: str) -> str:
@@ -66,18 +71,22 @@ def apply_via_postgres(password: str) -> None:
 
     settings = get_settings()
     ref = _project_ref(settings.supabase_url)
-    sql = MIGRATION_PATH.read_text(encoding="utf-8")
+    migrations = _migration_files()
+    if not migrations:
+        raise SystemExit(f"No migrations found in {MIGRATIONS_DIR}")
     conn_str = (
         f"host=db.{ref}.supabase.co port=5432 dbname=postgres "
         f"user=postgres password={password} sslmode=require"
     )
 
-    print(f"Applying migration to project {ref} ...")
+    print(f"Applying {len(migrations)} migration(s) to project {ref} ...")
     with psycopg2.connect(conn_str) as conn:
         conn.autocommit = True
         with conn.cursor() as cur:
-            cur.execute(sql)
-    print("Migration applied successfully.")
+            for path in migrations:
+                print(f"  -> {path.name}")
+                cur.execute(path.read_text(encoding="utf-8"))
+    print("Migrations applied successfully.")
 
 
 def print_sql_instructions() -> None:
@@ -90,12 +99,14 @@ def print_sql_instructions() -> None:
 
     ref = _project_ref(settings.supabase_url)
     dashboard_url = f"https://supabase.com/dashboard/project/{ref}/sql/new"
+    migrations = _migration_files()
     print("=== Apply schema in Supabase SQL Editor ===\n")
     print(f"1. Open: {dashboard_url}")
-    print(f"2. Paste the contents of: {MIGRATION_PATH}")
-    print("3. Click Run")
-    print("4. Verify: python scripts/apply_schema.py --check-only")
-    print("5. Seed:    python scripts/seed_supabase.py\n")
+    print("2. Paste and Run each migration in order:")
+    for path in migrations:
+        print(f"   - {path}")
+    print("3. Verify: python scripts/apply_schema.py --check-only")
+    print("4. Seed:    python scripts/seed_supabase.py\n")
 
 
 def main() -> int:

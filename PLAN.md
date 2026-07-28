@@ -36,8 +36,8 @@
 - [x] Verification script — `scripts/verify_phase1.py`
 - [x] Schema apply tooling — `scripts/apply_schema.py`, `scripts/setup_supabase.sh`
 - [x] GCP deploy assets — `Dockerfile`, `deploy/gcp_deploy.sh`, `deploy/README.md`
-- [ ] **Schema applied on live Supabase project** (`wjfxtmjjwezsamgiktzf`) ← paste SQL in dashboard
-- [ ] **GCP cron deployed** ← install gcloud, run `./deploy/gcp_deploy.sh all`
+- [x] **Schema applied on live Supabase project** (`wjfxtmjjwezsamgiktzf`)
+- [ ] **GCP cron deployed** ← `gcloud auth login` + `./deploy/gcp_deploy.sh all`
 - [ ] **Exit criteria confirmed in production:** 50+ runs/day, >95% success rate, results queryable in `raw_runs`
 
 ### Phase 1.5 — Concurrency & brand grounding (added scope) ✅ COMPLETE
@@ -49,12 +49,13 @@
 - [x] Bulk test tooling (Supabase-free) — `scripts/bulk_prompt_test.py` (`--limit`, `--concurrency`, `--sequential`, `--no-brand-context`)
 - [x] Test suite: 23 tests, all mocked, all passing
 
-### Phase 2 — Response Judge + GEO Score ⏳ NOT STARTED (next up)
-- [ ] Define GEO Score components (brand mention, recommendation position, sentiment, factual accuracy vs. truth registry)
-- [ ] Response Judge agent — classify/score each `raw_runs` row
-- [ ] Persist scores to Supabase `scores` table (schema already exists)
-- [ ] Scoring backfill over existing run data in `data/runs/`
-- [ ] Tests for judge + scoring
+### Phase 2 — Response Judge + GEO Score 🚧 IN PROGRESS
+- [x] Define GEO Score components (brand mention, recommendation position, sentiment, factual accuracy vs. truth registry)
+- [x] Response Judge agent — classify/score each `raw_runs` row — `backend/agents/response_judge/`
+- [x] Persist scores to Supabase `scores` table (migration `002_scores_columns.sql` applied)
+- [x] Scoring backfill over existing run data in `data/runs/` — `scripts/backfill_scores.py --local`
+- [x] Tests for judge + scoring — `tests/test_response_judge.py` (32 total suite)
+- [x] Supabase backfill of unscored `raw_runs` (heuristic) — 8/8 scored, avg GEO ~0.76
 
 ### Phase 3 — GEO Dashboard MVP ⏳ NOT STARTED
 - [ ] Score trends over time per engine/prompt category
@@ -65,6 +66,12 @@
 - [ ] Before/after measurement loop to validate the v1.0 hypothesis
 
 ## 3. Work log (append new entries at top)
+
+### 2026-07-28 — Productionize Phase 1 + start Phase 2
+- Committed/pushed Jul 13 docs, Supabase tooling, and GCP deploy assets to `org` + `origin` on `restructure/signal-mvp`.
+- Supabase project `wjfxtmjjwezsamgiktzf` resumed; verified 001 tables + seed (25 prompts). Pipeline smoke: 4/4 success (~$0.008).
+- Built Response Judge (`backend/agents/response_judge/`), migration `002_scores_columns.sql`, `scripts/backfill_scores.py`; local heuristic backfill scored 50 bulk rows. Suite now 32 tests.
+- **Blocked on:** paste/run migration 002 in SQL editor (no `SUPABASE_DB_PASSWORD`; `db.*.supabase.co` DNS not resolving yet). GCP: gcloud installed, auth/deploy pending.
 
 ### 2026-07-13 (evening) — Supabase setup tooling + GCP cron deploy assets
 - Added `scripts/apply_schema.py` (SQL editor instructions, optional `--apply` via `SUPABASE_DB_PASSWORD`), `scripts/setup_supabase.sh` (schema check → seed → pipeline smoke).
@@ -91,6 +98,8 @@
 
 | Date | Decision / change | Rationale |
 |------|-------------------|-----------|
+| 2026-07-28 | GEO Score weights: mention 0.30 / position 0.25 / sentiment 0.20 / accuracy 0.25 | Emphasize visibility (mention+position) while retaining quality signals |
+| 2026-07-28 | Judge: deterministic alias match + LLM soft scores (gpt-5-mini) | Cheap/testable mention detection; LLM for sentiment/factual accuracy vs registry |
 | 2026-07-13 | GCP cron via Cloud Run Jobs + Cloud Scheduler (not Vertex AI) | Free-tier infra; LLM calls stay on OpenAI/Gemini API keys |
 | 2026-07-13 | Schema apply via SQL editor or `apply_schema.py --apply` | User's Supabase project not linkable via CLI (different account) |
 | 2026-07-13 | Repo restructured to org skeleton; imports under `backend.` namespace | Match org `aurenix-signal` layout for merge into org repo |
@@ -112,11 +121,12 @@ Internal coupling to know about:
 
 ## 6. Known issues / open items
 
-- [ ] Apply Supabase schema on `wjfxtmjjwezsamgiktzf` — `python scripts/apply_schema.py --print-sql`
-- [ ] Run `scripts/setup_supabase.sh` after schema (seed + pipeline smoke)
-- [ ] Install gcloud + deploy cron — `./deploy/gcp_deploy.sh all`
+- [x] Apply Supabase schema 001 on `wjfxtmjjwezsamgiktzf`
+- [x] Seed + pipeline smoke (`verify_phase1` OK; smoke batch success=4)
+- [ ] Apply migration `002_scores_columns.sql` (GEO Score columns) — paste in SQL editor or set `SUPABASE_DB_PASSWORD`
+- [ ] Install gcloud + deploy cron — gcloud installed; need `gcloud auth login` + `./deploy/gcp_deploy.sh all`
 - [ ] `restructure/signal-mvp` → org `main` merge pending review.
-- [ ] Phase 1 exit criteria not yet proven in production.
+- [ ] Phase 1 exit criteria not yet proven in production (daily cron).
 - [ ] Week-0 manual baseline CSV not filled in.
 - [ ] Neutral vs. brand-grounded comparison run not yet executed/analyzed.
 - Note: brand-grounded API runs are a **measurement instrument** — they do not influence public model behavior.
@@ -125,6 +135,6 @@ Internal coupling to know about:
 
 1. Read this file, then `AGENTS.md` for conventions.
 2. `git fetch --all` and check you're on the right branch (`git status`).
-3. `python3 -m pytest tests/ -q` — 23 tests should pass before you start.
+3. `python3 -m pytest tests/ -q` — 32 tests should pass before you start.
 4. Pick up from §6 open items or the current phase in §2.
 5. **Before ending:** update §2 checkboxes, prepend a §3 work-log entry, record any §4 decisions, and refresh `STATUS.md` if the snapshot changed.

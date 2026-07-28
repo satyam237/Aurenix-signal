@@ -56,13 +56,18 @@ def check_supabase_connection() -> tuple[bool, str]:
         return False, "SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY not set in .env"
 
     required_tables = ("prompts", "run_batches", "raw_runs", "brand_config", "scores")
+    # Primary key column differs for brand_config
+    pk_column = {
+        "brand_config": "brand_id",
+    }
     try:
         client = get_supabase_client(settings)
         missing: list[str] = []
         counts: list[str] = []
         for table in required_tables:
             try:
-                result = client.table(table).select("id", count="exact").limit(1).execute()
+                col = pk_column.get(table, "id")
+                result = client.table(table).select(col, count="exact").limit(1).execute()
                 count = result.count if result.count is not None else len(result.data)
                 counts.append(f"{table}={count}")
             except Exception as exc:
