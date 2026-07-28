@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from backend.agents.response_judge.accuracy import _score_from_claims
 from backend.agents.response_judge.citation import score_citation
 from backend.agents.response_judge.composite import compute_geo_score, compute_share_of_voice
 from backend.agents.response_judge.inclusion import score_inclusion
@@ -63,6 +64,32 @@ def test_rank_list_first_with_prominence() -> None:
     assert r.list_position == 1
     assert r.prominence_bonus == 10
     assert r.score == 100
+
+
+def test_rank_list_second_position() -> None:
+    # Separate first paragraph so prominence bonus does not apply to the list body.
+    text = "Here are options.\n\n1. Generic Brand Pack\n2. The Nautikal Essential 7\n3. Other\n"
+    r = score_rank(text, registry=REGISTRY)
+    assert r.list_position == 2
+    assert r.prominence_bonus == 0
+    assert r.score == 80  # 100 - 20
+
+
+def test_accuracy_percent_correct() -> None:
+    assert _score_from_claims([]) == 50
+    assert _score_from_claims([{"label": "CORRECT"}, {"label": "CORRECT"}]) == 100
+    assert _score_from_claims([{"label": "CORRECT"}, {"label": "INCORRECT"}]) == 50
+    assert (
+        _score_from_claims(
+            [
+                {"label": "CORRECT"},
+                {"label": "UNSUPPORTED"},
+                {"label": "HALLUCINATED"},
+                {"label": "INCORRECT"},
+            ]
+        )
+        == 25
+    )
 
 
 def test_citation_owned_url() -> None:
@@ -123,12 +150,16 @@ def test_judge_response_heuristic_only() -> None:
     )
     assert result.brand_mentioned is True
     assert result.inclusion_score == 100
+    assert result.accuracy_score == 50  # heuristic default
     assert result.judge_model == "heuristic-only"
     assert 0.0 <= result.geo_score <= 100.0
     row = result.to_score_row(raw_run_id="run-1")
     assert row["raw_run_id"] == "run-1"
     assert row["inclusion_score"] == 100
-    assert "geo_score" in row
+    # DB column is 0–1; details keep PDF 0–100 for the dashboard
+    assert 0.0 <= row["geo_score"] <= 1.0
+    assert abs(row["geo_score"] * 100 - row["details"]["geo_score_100"]) < 0.02
+    assert abs(row["geo_score"] * 100 - result.geo_score) < 0.02
 
 
 def test_judge_response_with_mocked_llm() -> None:

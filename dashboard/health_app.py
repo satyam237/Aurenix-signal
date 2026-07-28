@@ -181,17 +181,26 @@ if scores:
     inclusion_pct = sum(1 for r in enriched if (r.get("inclusion_score") or 0) > 0) / n * 100
     avg_rank = sum(float(r.get("rank_score") or 0) for r in enriched) / n
     avg_acc = sum(float(r.get("accuracy_score") or 0) for r in enriched) / n
+    geo_vals = [float(r["geo_score_100"]) for r in enriched if r.get("geo_score_100") is not None]
+    avg_geo = sum(geo_vals) / len(geo_vals) if geo_vals else 0.0
     sov = compute_share_of_voice(enriched)
 
+    # Inclusion % == overall SoV by definition (included / total). Show GEO composite instead of a duplicate.
     g1, g2, g3, g4 = st.columns(4)
     with g1:
         st.metric("Inclusion %", f"{inclusion_pct:.1f}%")
     with g2:
-        st.metric("Avg Rank score", f"{avg_rank:.1f}")
+        st.metric("Avg Rank (0–100)", f"{avg_rank:.1f}")
     with g3:
-        st.metric("Accuracy %", f"{avg_acc:.1f}")
+        st.metric("Avg Accuracy (0–100)", f"{avg_acc:.1f}")
     with g4:
-        st.metric("Share-of-Voice", f"{sov['overall_sov']:.1f}%")
+        st.metric("Avg GEO Score (0–100)", f"{avg_geo:.1f}")
+
+    st.caption(
+        "GEO = 0.25×Inc + 0.25×Rank + 0.20×Acc + 0.15×Cit + 0.15×Sent. "
+        f"Overall SoV = Inclusion % = {sov['overall_sov']:.1f}% "
+        "(heuristic Accuracy defaults to 50 when scored with `--skip-llm`)."
+    )
 
     st.subheader("SoV by category")
     st.json(sov.get("by_category") or {})

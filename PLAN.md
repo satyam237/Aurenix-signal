@@ -34,15 +34,21 @@
 - [x] Concurrent runner, rate limits, checkpoints, pricing, brand system prompts, bulk tests
 
 ### Phase 2 — Response Judge ✅ (local, PDF-aligned)
-- [x] T-10–T-14 scorers + composite/SoV · T-15 calibrate script · GEO panel on health app · 39 tests
+- [x] T-10–T-14 scorers + composite/SoV · T-15 calibrate script · GEO panel on health app · 41 tests
+- [x] Accuracy = % CORRECT (no extra incorrect penalty) · health metrics show Avg GEO (not duplicate SoV tile)
 
 ### Phase 3 — GEO Dashboard MVP ⏳ NEXT
 - [ ] T-16 Home (scores + trends) · T-17 Prompt table · T-18 Viewer · T-19 Recommendations tab
+- [ ] Prompt + AI response + score drill-down lives here (not health app)
 
 ### Phase 4 — Recommender + loop ⏳
 - [ ] T-20–T-24 gap detection, ICE backlog, execution kits, before/after, digest
 
 ## 3. Work log (newest first)
+
+### 2026-07-29 — Scoring QA + PR for org main
+- Verified GEO weights/formula; fixed Accuracy to pure % CORRECT; health panel shows Avg GEO; added rank/accuracy/geo storage tests (41).
+- Docs updated; push `restructure/signal-mvp` + open PR for reviewer merge.
 
 ### 2026-07-29 — Docs + exoskeleton + Phase 2 push
 - Rewrote README/STATUS/AGENTS/PLAN for stage clarity; added `requirements.txt`; hardened packaging/gitignore.
@@ -58,6 +64,8 @@
 
 | Date | Decision | Why |
 |------|----------|-----|
+| 2026-07-29 | Accuracy score = % CORRECT only | Matches scorer/PDF intent; drop extra incorrect penalty |
+| 2026-07-29 | Health UI: Avg GEO tile; SoV kept under by-category | Inclusion % == overall SoV; avoid duplicate metric |
 | 2026-07-29 | Docs treat Phases 0–2 as “local production complete” | Matches runnable path without GCP |
 | 2026-07-29 | GEO weights = PDF 0.25/0.25/0.20/0.15/0.15 | Roadmap / Trello T-14 |
 | 2026-07-29 | Accuracy → Gemini; sentiment → OpenAI | PDF T-12 |
@@ -79,6 +87,6 @@
 ## 7. Session checklist
 
 1. Read this + `AGENTS.md`
-2. Branch `restructure/signal-mvp`; `pytest tests/ -q` (39)
+2. Branch `restructure/signal-mvp`; `pytest tests/ -q` (41)
 3. Prefer Phase 3 work unless directed otherwise
 4. End: update §2–4 + `STATUS.md`

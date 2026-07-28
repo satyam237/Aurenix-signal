@@ -15,7 +15,8 @@ GEO (AI Discovery Optimization) for **The Nautikal**: automate “what do ChatGP
 1. Prompts from `data/prompts/` (+ optional brand system prompt from truth registry)
 2. `prompt_runner` adapters call OpenAI / Gemini → rows in `raw_runs` / `run_batches`
 3. `response_judge` scorers write `scores` (inclusion, rank, accuracy, citation, sentiment, geo_score)
-4. `dashboard/health_app.py` shows batch health + GEO rollups (Inclusion %, Avg Rank, Accuracy %, SoV)
+4. `dashboard/health_app.py` shows batch health + GEO rollups (Inclusion %, Avg Rank, Avg Accuracy, Avg GEO; SoV by category)
+5. Phase 3 will add prompt table + response viewer (prompt text + AI answer + scores together)
 
 ## Repository layout
 
@@ -29,7 +30,7 @@ dashboard/health_app.py     Streamlit ops + GEO panel
 data/brands|prompts|baseline/
 supabase/migrations/        001 schema, 002 score cols, 003 PDF score cols
 scripts/                    run_daily_local, backfill, calibrate, seed, apply_schema, …
-tests/                      mocked pytest (39)
+tests/                      mocked pytest (41)
 deploy/                     optional GCP (not required for local prod path)
 docs/                       roadmap PDF
 ```

@@ -14,9 +14,10 @@ The system can run prompts daily, score them into a GEO Score, and show ops + GE
 | **Product** | GEO platform — brand visibility in ChatGPT/Gemini answers |
 | **Brand** | The Nautikal |
 | **Branch** | `restructure/signal-mvp` (pushed to `org` + `origin`) |
-| **Tests** | 39/39 mocked, passing |
+| **Tests** | 41/41 mocked, passing |
 | **Data store** | Supabase project live; migrations `001`–`003` applied |
 | **Cron** | Local: `./scripts/run_daily_local.sh` · GCP: deferred |
+| **PR** | Open `restructure/signal-mvp` → org `main` for review/merge |
 
 ## What is built
 
@@ -25,7 +26,8 @@ The system can run prompts daily, score them into a GEO Score, and show ops + GE
 | Prompt execution | `backend/agents/prompt_runner` → OpenAI + Gemini → `raw_runs` |
 | Scoring | `backend/agents/response_judge` PDF scorers → `scores` |
 | GEO formula | 0.25 Inc + 0.25 Rank + 0.20 Acc + 0.15 Cit + 0.15 Sent |
-| Ops + GEO UI | `dashboard/health_app.py` |
+| Accuracy | % CORRECT among LLM-labeled claims; heuristic mid=50 without `--llm` |
+| Ops + GEO UI | `dashboard/health_app.py` — Inclusion %, Avg Rank/Accuracy/GEO (+ SoV by category) |
 | Calibration | `scripts/calibrate_scores.py` → CSV for human QA |
 
 ## Phase board
@@ -48,6 +50,7 @@ streamlit run dashboard/health_app.py
 
 ## Next
 
-1. Phase 3 GEO Dashboard (home, prompt table, response viewer)
-2. Optional: finish human columns on latest calibration CSV
-3. Optional: re-enable GCP Cloud Run cron when billing/access is stable
+1. Reviewer merges open PR on org `main`
+2. Phase 3 GEO Dashboard (home, prompt table, response viewer — T-16–T-19)
+3. Optional: finish human columns on latest calibration CSV
+4. Optional: re-enable GCP Cloud Run cron when billing/access is stable

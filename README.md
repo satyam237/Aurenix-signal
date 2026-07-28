@@ -15,7 +15,7 @@
 
 1. **Prompt Runner (Phase 1)** — runs 25 brand prompts against OpenAI + Gemini, stores raw answers in Supabase (`raw_runs` / `run_batches`).
 2. **Response Judge (Phase 2)** — scores each answer: Inclusion, Rank, Accuracy, Citation, Sentiment → composite GEO Score + Share-of-Voice.
-3. **Ops UI** — Streamlit health dashboard with batch health **and** GEO score metrics (not the full Phase 3 product dashboard yet).
+3. **Ops UI** — Streamlit health dashboard with batch health **and** GEO score metrics (Inclusion %, Avg Rank, Avg Accuracy, Avg GEO). Full prompt + response viewer is Phase 3 (T-17/T-18), not this health app.
 
 ## Architecture
 
@@ -54,7 +54,8 @@
 
 **GEO formula (roadmap):**  
 `(0.25×Inclusion) + (0.25×Rank) + (0.20×Accuracy) + (0.15×Citation) + (0.15×Sentiment)`  
-SoV = included prompts / scored prompts × 100 (by category).
+SoV = included prompts / scored prompts × 100 (by category; same as Inclusion % overall).  
+**Accuracy** = % of brand claims labeled `CORRECT` by the LLM judge (neutral **50** when scoring with `--skip-llm`). Component scores are 0–100; `scores.geo_score` is stored 0–1 with `details.geo_score_100` for the UI.
 
 ## Roadmap phases
 
@@ -115,8 +116,16 @@ Cheap smoke (no Supabase): `python scripts/bulk_prompt_test.py --limit 3`
 ## Tests
 
 ```bash
-python -m pytest tests/ -q   # must pass before commit; all network mocked
+python -m pytest tests/ -q   # must pass before commit; all network mocked (41+)
 ```
+
+## Health dashboard vs Phase 3
+
+| | Health app (`dashboard/health_app.py`) | Phase 3 GEO Dashboard |
+|--|--|--|
+| Batch / cost / failures | Yes | Ops secondary |
+| GEO rollups + score table | Yes | Yes (richer) |
+| Prompt text + AI response + drill-down | No (use Supabase / calibrate CSV) | Yes (T-17, T-18) |
 
 ## Optional GCP cron
 

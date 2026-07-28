@@ -52,20 +52,18 @@ def _parse_json(text: str) -> dict[str, Any]:
 
 
 def _score_from_claims(claims: list[dict[str, str]]) -> int:
+    """Accuracy = % of brand claims labeled CORRECT (0–100). Empty claims → 50."""
     if not claims:
         return 50
     labels = [str(c.get("label", "")).upper() for c in claims]
     correct = sum(1 for lab in labels if lab == "CORRECT")
-    incorrect = sum(1 for lab in labels if lab in {"INCORRECT", "HALLUCINATED"})
-    # Penalize incorrect/hallucinated heavily
-    raw = (correct / len(labels)) * 100
-    penalty = (incorrect / len(labels)) * 40
-    return int(max(0, min(100, round(raw - penalty))))
+    return int(max(0, min(100, round(100.0 * correct / len(labels)))))
 
 
 def score_accuracy_heuristic(brand_mentioned: bool) -> AccuracyResult:
-    """Neutral default when LLM is skipped."""
-    return AccuracyResult(50 if brand_mentioned else 50, [], "heuristic_neutral", "heuristic-only")
+    """Neutral mid-score when LLM is skipped (same whether brand is mentioned)."""
+    _ = brand_mentioned
+    return AccuracyResult(50, [], "heuristic_neutral", "heuristic-only")
 
 
 def score_accuracy(
