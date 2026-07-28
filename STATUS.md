@@ -1,56 +1,52 @@
 # Project Status — AureniX Signal
 
-_Last updated: 2026-07-29_
+_Last updated: 2026-07-29 (session closed)_
 
-> One-page snapshot. Details and checkboxes: [`PLAN.md`](PLAN.md). Setup: [`README.md`](README.md). Agents: [`AGENTS.md`](AGENTS.md).
+> Snapshot. Detail: [`PLAN.md`](PLAN.md). Setup: [`README.md`](README.md). Agents: [`AGENTS.md`](AGENTS.md).
 
 ## Where we are
 
-**Phases 0–2 are complete for local production use.**  
-The system can run prompts daily, score them into a GEO Score, and show ops + GEO metrics in Streamlit. **Phase 3 (full GEO product dashboard) is next.**
+**Phases 0–2 are complete, on org `main` (PR #2 merged).**  
+Daily local run → score → Streamlit ops/GEO panel works. **Next session: Phase 3 GEO Dashboard.**
 
 | | |
 |--|--|
-| **Product** | GEO platform — brand visibility in ChatGPT/Gemini answers |
+| **Product** | GEO — brand visibility in ChatGPT/Gemini answers |
 | **Brand** | The Nautikal |
-| **Branch** | `restructure/signal-mvp` (pushed to `org` + `origin`) |
+| **Git** | Org `main` includes latest QA (`8d3a243` via PR #2 `011a15c`); branch `restructure/signal-mvp` |
 | **Tests** | 41/41 mocked, passing |
-| **Data store** | Supabase project live; migrations `001`–`003` applied |
-| **Cron** | Local: `./scripts/run_daily_local.sh` · GCP: deferred |
-| **PR** | Open `restructure/signal-mvp` → org `main` for review/merge |
+| **Supabase** | Live; migrations `001`–`003` |
+| **Cron** | `./scripts/run_daily_local.sh` · GCP deferred |
 
-## What is built
+## Built
 
-| Capability | How |
-|------------|-----|
-| Prompt execution | `backend/agents/prompt_runner` → OpenAI + Gemini → `raw_runs` |
-| Scoring | `backend/agents/response_judge` PDF scorers → `scores` |
-| GEO formula | 0.25 Inc + 0.25 Rank + 0.20 Acc + 0.15 Cit + 0.15 Sent |
-| Accuracy | % CORRECT among LLM-labeled claims; heuristic mid=50 without `--llm` |
-| Ops + GEO UI | `dashboard/health_app.py` — Inclusion %, Avg Rank/Accuracy/GEO (+ SoV by category) |
-| Calibration | `scripts/calibrate_scores.py` → CSV for human QA |
+| Capability | Notes |
+|------------|--------|
+| Prompt Runner | OpenAI + Gemini → `raw_runs` |
+| Response Judge | PDF GEO 0.25/0.25/0.20/0.15/0.15; Accuracy = % CORRECT |
+| Health UI | Inclusion %, Avg Rank/Accuracy/**GEO**; SoV by category |
+| Not yet | Prompt text + AI response drill-down → **Phase 3** |
 
 ## Phase board
 
-| Phase | Status | Notes |
-|-------|--------|-------|
-| 0 Foundation | Done | Week-0 manual UI baseline (T-02) still optional |
-| 1 Prompt Runner | Done locally | T-06–T-09; GCP scheduler optional |
-| 2 Response Judge | Done locally | T-10–T-15 |
-| 3 GEO Dashboard | **Next** | T-16–T-19 |
-| 4 Recommender | Not started | T-20–T-24 |
+| Phase | Status |
+|-------|--------|
+| 0 Foundation | Done (T-02 optional) |
+| 1 Prompt Runner | Done locally (T-06–T-09) |
+| 2 Response Judge | Done (T-10–T-15) · **on main** |
+| 3 GEO Dashboard | **Next** (T-16–T-19) |
+| 4 Recommender | Not started |
 
-## How to run (operators)
+## Run
 
 ```bash
 source .venv/bin/activate
-./scripts/run_daily_local.sh
+./scripts/run_daily_local.sh          # add --llm for real Accuracy/Sentiment
 streamlit run dashboard/health_app.py
+python -m pytest tests/ -q
 ```
 
-## Next
+## Next session
 
-1. Reviewer merges open PR on org `main`
-2. Phase 3 GEO Dashboard (home, prompt table, response viewer — T-16–T-19)
-3. Optional: finish human columns on latest calibration CSV
-4. Optional: re-enable GCP Cloud Run cron when billing/access is stable
+1. Phase 3: home + **prompt table** + **response viewer**
+2. Optional: T-02 baseline / calibration human QA / GCP cron

@@ -8,7 +8,7 @@ Guidance for AI coding agents and humans working in this repo.
 
 GEO (AI Discovery Optimization) for **The Nautikal**: automate “what do ChatGPT/Gemini say?”, score answers into a **GEO Score**, later recommend content fixes.
 
-**Current stage:** Phases **0–2 done locally**. Do not start Phase 4. Prefer Phase 3 dashboard work unless asked otherwise.
+**Current stage:** Phases **0–2 done and on org `main` (PR #2)**. Do not start Phase 4. Prefer **Phase 3** (prompt table + response viewer) unless asked otherwise.
 
 ## How it works (data flow)
 

@@ -1,92 +1,79 @@
 # PLAN.md — AureniX Signal Work Plan & Progress Log
 
-> Living source of truth for progress. Read at session start; update before ending (checkboxes, work log, decisions).  
-> Companions: [`STATUS.md`](STATUS.md) · [`AGENTS.md`](AGENTS.md) · [`README.md`](README.md) · roadmap [`docs/AureniX_Signal_Roadmap_Updated.pdf`](docs/AureniX_Signal_Roadmap_Updated.pdf)
+> Living source of truth. Read at session start; update before ending.  
+> Companions: [`STATUS.md`](STATUS.md) · [`AGENTS.md`](AGENTS.md) · [`README.md`](README.md) · [`docs/AureniX_Signal_Roadmap_Updated.pdf`](docs/AureniX_Signal_Roadmap_Updated.pdf)
 
 ---
 
-## 1. Project overview
+## 1. Overview
 
 | | |
 |--|--|
-| **What** | GEO platform: measure brand presence in AI answers → GEO Score → (later) content recommendations |
-| **Brand** | The Nautikal (thenautikal.com) |
-| **Stack** | Python 3.11+ · Supabase · OpenAI + Gemini · Streamlit · local cron script |
-| **Stage now** | **Phases 0–2 complete locally** · **Next = Phase 3 GEO Dashboard** |
-| **Branch** | `restructure/signal-mvp` → org `main` |
+| **What** | GEO: brand presence in AI answers → GEO Score → (later) content fixes |
+| **Brand** | The Nautikal |
+| **Stack** | Python · Supabase · OpenAI + Gemini · Streamlit · local cron |
+| **Stage** | **Phases 0–2 done & on org `main` (PR #2)** · **Next = Phase 3** |
+| **Branch** | `restructure/signal-mvp` (synced with merged work) |
 | **Remotes** | `org` = The-Aurenix/aurenix-signal · `origin` = satyam237/Aurenix-signal |
 
-**How (pipeline):** prompts → `prompt_runner` → `raw_runs` → `response_judge` scorers → `scores` → health/GEO Streamlit panel.
+**Pipeline:** prompts → `prompt_runner` → `raw_runs` → `response_judge` → `scores` → health/GEO panel.
 
-**GEO (PDF):** `(0.25×I)+(0.25×R)+(0.20×A)+(0.15×C)+(0.15×S)`; SoV by category.
+**GEO:** `(0.25×I)+(0.25×R)+(0.20×A)+(0.15×C)+(0.15×S)`; Accuracy = % CORRECT; SoV by category.
 
-## 2. Phase plan & progress
+## 2. Phase progress
 
 ### Phase 0 — Foundation ✅
-- [x] Scaffold, truth registry, 25 prompts (+ neutral), migrations 001–003, baseline CSV template
-- [ ] T-02 Week-0 manual ChatGPT/Gemini UI baseline (human)
+- [x] Scaffold, truth registry, prompts, migrations 001–003
+- [ ] T-02 Week-0 manual ChatGPT/Gemini UI baseline (human, optional)
 
-### Phase 1 — Prompt Runner ✅ (local)
-- [x] T-06 Adapters · T-07 Pipeline · T-08 Local cron (`run_daily_local.sh`) · T-09 Health dashboard
+### Phase 1 — Prompt Runner ✅
+- [x] T-06 Adapters · T-07 Pipeline · T-08 Local cron · T-09 Health dashboard
 - [ ] Optional GCP Cloud Run Scheduler
 
 ### Phase 1.5 — Concurrency & grounding ✅
-- [x] Concurrent runner, rate limits, checkpoints, pricing, brand system prompts, bulk tests
+- [x] Concurrent runner, rate limits, checkpoints, pricing, brand grounding
 
-### Phase 2 — Response Judge ✅ (local, PDF-aligned)
-- [x] T-10–T-14 scorers + composite/SoV · T-15 calibrate script · GEO panel on health app · 41 tests
-- [x] Accuracy = % CORRECT (no extra incorrect penalty) · health metrics show Avg GEO (not duplicate SoV tile)
+### Phase 2 — Response Judge ✅
+- [x] T-10–T-15 scorers + composite/SoV · calibrate · GEO panel · **41 tests**
+- [x] Accuracy = % CORRECT · health shows Avg GEO (SoV under by-category)
 
-### Phase 3 — GEO Dashboard MVP ⏳ NEXT
-- [ ] T-16 Home (scores + trends) · T-17 Prompt table · T-18 Viewer · T-19 Recommendations tab
-- [ ] Prompt + AI response + score drill-down lives here (not health app)
+### Phase 3 — GEO Dashboard MVP ⏳ **NEXT**
+- [ ] T-16 Home · T-17 Prompt table · T-18 Response viewer · T-19 Recommendations
+- [ ] Drill-down: prompt + AI answer + scores (not in health app today)
 
-### Phase 4 — Recommender + loop ⏳
-- [ ] T-20–T-24 gap detection, ICE backlog, execution kits, before/after, digest
+### Phase 4 — Recommender ⏳
+- [ ] T-20–T-24
 
-## 3. Work log (newest first)
+## 3. Work log (compact)
 
-### 2026-07-29 — Scoring QA + PR for org main
-- Verified GEO weights/formula; fixed Accuracy to pure % CORRECT; health panel shows Avg GEO; added rank/accuracy/geo storage tests (41).
-- Docs updated; push `restructure/signal-mvp` + open PR for reviewer merge.
+### 2026-07-29 — Session wrap (PR #2 on org `main`)
+- Phases 0–2 local path productionized; scoring QA (Accuracy % CORRECT, Avg GEO tile); docs; **41** tests.
+- Pushed `restructure/signal-mvp`; **merged to org `main` via PR #2** (`011a15c`).
+- Trello Done: T-06–T-15 (T-08 = local cron). Leave open: T-02, GCP cron, T-16+.
+- Health app = ops + GEO rollups; **prompt/response viewer = Phase 3**.
 
-### 2026-07-29 — Docs + exoskeleton + Phase 2 push
-- Rewrote README/STATUS/AGENTS/PLAN for stage clarity; added `requirements.txt`; hardened packaging/gitignore.
-- Phase 2 PDF scorers already in tree; commit + push production-ready local path.
-
-### 2026-07-29 — Close Phase 2 locally
-- Discrete scorers, migration 003, local daily script, calibration CSV, GEO health panel.
-
-### 2026-07-28 — Supabase live + early judge + GCP attempt
-- Schema/seed/smoke; GCP project created; cron deferred in favor of local.
+### Earlier 2026-07-28–29
+- Supabase live, Phase 2 scorers, local daily script; GCP deferred; packaging/docs rewrite.
 
 ## 4. Decisions
 
-| Date | Decision | Why |
-|------|----------|-----|
-| 2026-07-29 | Accuracy score = % CORRECT only | Matches scorer/PDF intent; drop extra incorrect penalty |
-| 2026-07-29 | Health UI: Avg GEO tile; SoV kept under by-category | Inclusion % == overall SoV; avoid duplicate metric |
-| 2026-07-29 | Docs treat Phases 0–2 as “local production complete” | Matches runnable path without GCP |
-| 2026-07-29 | GEO weights = PDF 0.25/0.25/0.20/0.15/0.15 | Roadmap / Trello T-14 |
-| 2026-07-29 | Accuracy → Gemini; sentiment → OpenAI | PDF T-12 |
-| 2026-07-13 | `backend.` namespace + org skeleton | Merge into aurenix-signal |
+| Date | Decision |
+|------|----------|
+| 2026-07-29 | Accuracy = % CORRECT only; health Avg GEO (not duplicate SoV tile) |
+| 2026-07-29 | Phases 0–2 = local production complete; GCP optional |
+| 2026-07-29 | GEO weights PDF 0.25/0.25/0.20/0.15/0.15; Acc→Gemini, Sent→OpenAI |
+| 2026-07-13 | `backend.` namespace + org skeleton |
 
-## 5. Dependencies
+## 5. Open items
 
-- Install: `pip install -e ".[dev]"` or `pip install -r requirements.txt`
-- Declared in [`pyproject.toml`](pyproject.toml); lock-free pins via `requirements.txt` mirrors
-
-## 6. Open items
-
-- [ ] Phase 3 T-16–T-19
+- [ ] **Phase 3** T-16–T-19
 - [ ] T-02 Week-0 manual baseline
 - [ ] Human QA columns on calibration CSV
 - [ ] GCP cron (optional)
-- [ ] Merge `restructure/signal-mvp` → org `main`
 
-## 7. Session checklist
+## 6. Next session
 
-1. Read this + `AGENTS.md`
-2. Branch `restructure/signal-mvp`; `pytest tests/ -q` (41)
-3. Prefer Phase 3 work unless directed otherwise
-4. End: update §2–4 + `STATUS.md`
+1. Pull/sync `org/main` (or `restructure/signal-mvp`)
+2. `pytest tests/ -q` (41)
+3. Start **Phase 3** (prompt table + response viewer first)
+4. End: update this file + `STATUS.md`

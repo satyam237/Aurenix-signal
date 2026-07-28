@@ -1,7 +1,7 @@
 # AureniX Signal — Claude / Cursor entry
 
-Full agent conventions: **[`AGENTS.md`](AGENTS.md)**. Progress: **[`PLAN.md`](PLAN.md)**. Snapshot: **[`STATUS.md`](STATUS.md)**. Setup: **[`README.md`](README.md)**.
+Full conventions: **[`AGENTS.md`](AGENTS.md)**. Progress: **[`PLAN.md`](PLAN.md)**. Snapshot: **[`STATUS.md`](STATUS.md)**. Setup: **[`README.md`](README.md)**.
 
-**Stage:** Phases 0–2 complete locally → next is Phase 3 GEO Dashboard.
+**Stage (2026-07-29):** Phases 0–2 complete, merged to org `main` (PR #2). **Next = Phase 3 GEO Dashboard** (prompt + response + scores viewer).
 
-Non-negotiables: `backend.` imports · brand facts only from truth registry · mocked tests only · no secrets in git · prefer `--limit` / `--skip-llm` for live API cost control.
+Non-negotiables: `backend.` imports · brand facts only from truth registry · mocked tests only · no secrets in git · prefer `--limit` / `--skip-llm` for API cost control.

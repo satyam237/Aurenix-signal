@@ -4,10 +4,10 @@
 
 | | |
 |--|--|
-| **Stage** | **Phases 0–2 complete locally.** Phase 3 (GEO Dashboard MVP) is next. |
+| **Stage** | **Phases 0–2 complete and merged to org `main` (PR #2).** Phase 3 (GEO Dashboard) is next. |
 | **Case study** | [The Nautikal](https://www.thenautikal.com) — cruise travel accessories |
 | **Hypothesis** | Targeted content changes raise AI recommendation rate, measured by a composite **GEO Score** |
-| **Branch** | `restructure/signal-mvp` → org `main` |
+| **Git** | Canonical `The-Aurenix/aurenix-signal` · branch `restructure/signal-mvp` (work also on `main`) |
 | **Roadmap** | [`docs/AureniX_Signal_Roadmap_Updated.pdf`](docs/AureniX_Signal_Roadmap_Updated.pdf) |
 | **Status snapshot** | [`STATUS.md`](STATUS.md) · living plan [`PLAN.md`](PLAN.md) · agents [`AGENTS.md`](AGENTS.md) |
 
@@ -63,7 +63,7 @@ SoV = included prompts / scored prompts × 100 (by category; same as Inclusion %
 |-------|-------|--------|
 | 0 | Baseline, Truth Registry, schema, scaffold | Done |
 | 1 | Prompt Runner → Supabase (+ local cron) | Done locally; GCP optional |
-| 2 | Response Judge + GEO Score | Done locally |
+| 2 | Response Judge + GEO Score | Done · on org `main` |
 | 3 | GEO Dashboard MVP (T-16–T-19) | **Next** |
 | 4 | Recommender + before/after loop | Not started |
 
