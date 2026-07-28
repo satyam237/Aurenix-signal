@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 
 import streamlit as st
 
+from backend.agents.response_judge.composite import compute_share_of_voice
 from backend.shared.config import get_settings
 from backend.shared.supabase_client import get_supabase_client
 
@@ -91,6 +92,7 @@ if last_batch:
             "cost_usd": last_batch.get("total_cost_usd"),
         }
     )
+    st.caption(f"Last run timestamp: {last_batch.get('started_at')}")
 else:
     st.info("No batches yet. Run: `python -m backend.agents.prompt_runner.pipeline`")
 
@@ -114,6 +116,108 @@ if failures:
     st.dataframe(failures, use_container_width=True)
 else:
     st.success("No recent failures.")
+
+# --- Phase 2 GEO scores panel (PDF DONE WHEN metrics) ---
+st.divider()
+st.header("GEO Scores (Phase 2)")
+
+score_cols = (
+    "id,raw_run_id,inclusion_score,rank_score,accuracy_score,citation_score,"
+    "sentiment_score,geo_score,brand_mentioned,created_at,details"
+)
+try:
+    scores = (
+        client.table("scores")
+        .select(score_cols)
+        .order("created_at", desc=True)
+        .limit(200)
+        .execute()
+        .data
+        or []
+    )
+except Exception as exc:
+    st.warning(
+        f"Could not load Phase 2 score columns ({exc}). "
+        "Apply `supabase/migrations/003_phase2_score_components.sql` in the SQL editor."
+    )
+    scores = []
+
+if scores:
+    prompts = {
+        p["id"]: p for p in (client.table("prompts").select("id,category").execute().data or [])
+    }
+    runs_by_id = {
+        r["id"]: r
+        for r in (
+            client.table("raw_runs")
+            .select("id,prompt_id,engine")
+            .in_("id", [s["raw_run_id"] for s in scores if s.get("raw_run_id")])
+            .execute()
+            .data
+            or []
+        )
+    }
+
+    enriched = []
+    for s in scores:
+        run = runs_by_id.get(s.get("raw_run_id") or "", {})
+        pid = run.get("prompt_id")
+        cat = (prompts.get(pid) or {}).get("category", "unknown")
+        geo100 = (s.get("details") or {}).get("geo_score_100")
+        if geo100 is None and s.get("geo_score") is not None:
+            geo100 = float(s["geo_score"]) * 100
+        enriched.append(
+            {
+                **s,
+                "prompt_id": pid,
+                "category": cat,
+                "engine": run.get("engine"),
+                "inclusion_score": s.get("inclusion_score") or 0,
+                "geo_score_100": geo100,
+            }
+        )
+
+    n = len(enriched)
+    inclusion_pct = sum(1 for r in enriched if (r.get("inclusion_score") or 0) > 0) / n * 100
+    avg_rank = sum(float(r.get("rank_score") or 0) for r in enriched) / n
+    avg_acc = sum(float(r.get("accuracy_score") or 0) for r in enriched) / n
+    sov = compute_share_of_voice(enriched)
+
+    g1, g2, g3, g4 = st.columns(4)
+    with g1:
+        st.metric("Inclusion %", f"{inclusion_pct:.1f}%")
+    with g2:
+        st.metric("Avg Rank score", f"{avg_rank:.1f}")
+    with g3:
+        st.metric("Accuracy %", f"{avg_acc:.1f}")
+    with g4:
+        st.metric("Share-of-Voice", f"{sov['overall_sov']:.1f}%")
+
+    st.subheader("SoV by category")
+    st.json(sov.get("by_category") or {})
+
+    st.subheader("Recent scores")
+    display_cols = [
+        "created_at",
+        "prompt_id",
+        "category",
+        "engine",
+        "inclusion_score",
+        "rank_score",
+        "accuracy_score",
+        "citation_score",
+        "sentiment_score",
+        "geo_score_100",
+        "brand_mentioned",
+    ]
+    st.dataframe(
+        [{k: r.get(k) for k in display_cols} for r in enriched[:50]], use_container_width=True
+    )
+else:
+    st.info(
+        "No scores yet. Run: `python scripts/backfill_scores.py --supabase --skip-llm --rescore` "
+        "or `./scripts/run_daily_local.sh --score-only`"
+    )
 
 st.caption(
     f"Daily cost cap: ${settings.daily_cost_cap_usd:.2f} | "

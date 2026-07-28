@@ -121,6 +121,7 @@ def main() -> int:
     parser.add_argument("--local", action="store_true", help="Score data/runs bulk JSON")
     parser.add_argument("--supabase", action="store_true", help="Score unscored raw_runs")
     parser.add_argument("--skip-llm", action="store_true", help="Heuristic-only (no API)")
+    parser.add_argument("--rescore", action="store_true", help="Re-score even if scores row exists")
     parser.add_argument("--limit", type=int, default=50)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("-v", "--verbose", action="store_true")
@@ -150,6 +151,7 @@ def main() -> int:
             limit=args.limit,
             skip_llm=args.skip_llm,
             dry_run=args.dry_run,
+            rescore=args.rescore,
         )
         summaries.append({"mode": "supabase", **summary})
         print(json.dumps(summaries[-1], indent=2, default=str))

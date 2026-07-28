@@ -1,7 +1,9 @@
 .venv/
 __pycache__/
 *.py[cod]
+*$py.class
 *.egg-info/
+.eggs/
 dist/
 build/
 .env
@@ -13,4 +15,8 @@ supabase/.temp/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.coverage
+htmlcov/
 .streamlit/secrets.toml
+.cursor/
+*.partial.json

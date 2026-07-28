@@ -1,0 +1,19 @@
+# Runtime dependencies for AureniX Signal (mirrors pyproject.toml).
+# Preferred install: pip install -e ".[dev]"
+# Alternate:       pip install -r requirements.txt && pip install -e .
+
+openai>=1.40.0
+google-genai>=1.0.0
+supabase>=2.7.0
+pydantic>=2.8.0
+pydantic-settings>=2.4.0
+python-dotenv>=1.0.0
+tenacity>=8.5.0
+streamlit>=1.38.0
+
+# Optional DB apply path (scripts/apply_schema.py --apply):
+# psycopg2-binary>=2.9.9
+
+# Dev (also: pip install -e ".[dev]"):
+# pytest>=8.3.0
+# ruff>=0.6.0

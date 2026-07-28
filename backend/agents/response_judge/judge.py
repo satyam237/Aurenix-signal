@@ -1,67 +1,22 @@
-"""Score a single engine response into GEO Score components.
-
-Brand mention + position use deterministic alias matching against the truth
-registry. Sentiment and factual accuracy use an LLM judge (gpt-5-mini by
-default) grounded in the same registry facts.
-"""
+"""Orchestrate PDF-aligned scorers into a JudgeResult for persistence."""
 
 from __future__ import annotations
 
-import json
-import logging
-import re
 from dataclasses import asdict, dataclass, field
 from typing import Any, Protocol
 
+from backend.agents.response_judge.accuracy import score_accuracy
+from backend.agents.response_judge.citation import score_citation
+from backend.agents.response_judge.composite import compute_geo_score
+from backend.agents.response_judge.inclusion import score_inclusion
+from backend.agents.response_judge.rank import score_rank
+from backend.agents.response_judge.sentiment import score_sentiment
+from backend.agents.response_judge.weights import DEFAULT_WEIGHTS, GeoScoreWeights
 from backend.shared.brand_context import load_truth_registry
 from backend.shared.config import Settings, get_settings
-from backend.agents.response_judge.weights import DEFAULT_WEIGHTS, GeoScoreWeights
 
-logger = logging.getLogger(__name__)
-
-JUDGE_SYSTEM_PROMPT = """You are a GEO (AI Discovery Optimization) response judge.
-Score how well an AI assistant response represents The Nautikal brand.
-
-Return ONLY valid JSON with these keys:
-- sentiment: number 0.0–1.0 (0=negative/hostile toward brand, 0.5=neutral/absent, 1.0=positive recommendation)
-- factual_accuracy: number 0.0–1.0 (1.0=all brand claims match verified facts; 0.5=no brand claims; 0.0=contradicts verified facts or asserts disallowed claims)
-- recommendation_rank: integer or null (1=first brand recommended, 2=second, …; null if brand not recommended)
-- notes: short string explaining the scores
-
-Use ONLY the verified facts and disallowed claims provided. Do not invent product details."""
-
-
-@dataclass(frozen=True)
-class BrandMention:
-    mentioned: bool
-    alias: str | None
-    char_offset: int | None
-    position_score: float | None  # 1.0 = mentioned at start, 0.0 = at end
-
-
-@dataclass(frozen=True)
-class JudgeResult:
-    brand_mentioned: bool
-    mention_position: float | None
-    sentiment: float
-    factual_accuracy: float
-    geo_score: float
-    judge_model: str
-    details: dict[str, Any] = field(default_factory=dict)
-
-    def to_score_row(self, raw_run_id: str | None = None) -> dict[str, Any]:
-        row: dict[str, Any] = {
-            "brand_mentioned": self.brand_mentioned,
-            "mention_position": self.mention_position,
-            "sentiment": round(self.sentiment, 4),
-            "factual_accuracy": round(self.factual_accuracy, 4),
-            "geo_score": round(self.geo_score, 4),
-            "judge_model": self.judge_model,
-            "details": self.details,
-        }
-        if raw_run_id is not None:
-            row["raw_run_id"] = raw_run_id
-        return row
+# Back-compat re-exports for older imports/tests
+from backend.agents.response_judge.inclusion import InclusionResult  # noqa: F401
 
 
 class LlmCompleter(Protocol):
@@ -71,130 +26,72 @@ class LlmCompleter(Protocol):
 GEO_SCORE_WEIGHTS = DEFAULT_WEIGHTS
 
 
+@dataclass(frozen=True)
+class BrandMention:
+    """Legacy shape used by older tests — derived from inclusion."""
+
+    mentioned: bool
+    alias: str | None
+    char_offset: int | None
+    position_score: float | None
+
+
+@dataclass(frozen=True)
+class JudgeResult:
+    inclusion_score: int
+    rank_score: int
+    accuracy_score: int
+    citation_score: int
+    sentiment_score: int
+    geo_score: float  # 0–100 PDF scale
+    brand_mentioned: bool
+    mention_position: float | None  # legacy 0–1 earlyness
+    sentiment: float  # legacy 0–1
+    factual_accuracy: float  # legacy 0–1
+    judge_model: str
+    details: dict[str, Any] = field(default_factory=dict)
+
+    def to_score_row(self, raw_run_id: str | None = None) -> dict[str, Any]:
+        row: dict[str, Any] = {
+            "inclusion_score": self.inclusion_score,
+            "rank_score": self.rank_score,
+            "accuracy_score": self.accuracy_score,
+            "citation_score": self.citation_score,
+            "sentiment_score": self.sentiment_score,
+            "geo_score": round(self.geo_score / 100.0, 4),  # store 0–1 for existing column
+            "brand_mentioned": self.brand_mentioned,
+            "mention_position": self.mention_position,
+            "sentiment": round(self.sentiment, 4),
+            "factual_accuracy": round(self.factual_accuracy, 4),
+            "judge_model": self.judge_model,
+            "details": {
+                **self.details,
+                "geo_score_100": self.geo_score,
+            },
+        }
+        if raw_run_id is not None:
+            row["raw_run_id"] = raw_run_id
+        return row
+
+
 def detect_brand_mention(
     response_text: str,
     aliases: list[str] | None = None,
 ) -> BrandMention:
-    """Find the earliest brand alias mention (case-insensitive)."""
-    if not response_text.strip():
-        return BrandMention(False, None, None, None)
-
-    if aliases is None:
-        registry = load_truth_registry()
-        aliases = list(registry.get("brand_aliases", []))
-        brand_name = registry.get("brand_name")
-        if brand_name and brand_name not in aliases:
-            aliases = [brand_name, *aliases]
-
-    text_lower = response_text.lower()
-    best: tuple[int, str] | None = None
-    for alias in aliases:
-        if not alias:
-            continue
-        idx = text_lower.find(alias.lower())
-        if idx < 0:
-            continue
-        if best is None or idx < best[0]:
-            best = (idx, alias)
-
-    if best is None:
-        return BrandMention(False, None, None, None)
-
-    offset, alias = best
-    # Earlier mentions score higher; empty text already handled.
-    denom = max(len(response_text) - 1, 1)
-    position_score = 1.0 - (offset / denom)
-    return BrandMention(True, alias, offset, max(0.0, min(1.0, position_score)))
-
-
-def compute_geo_score(
-    *,
-    brand_mentioned: bool,
-    mention_position: float | None,
-    sentiment: float,
-    factual_accuracy: float,
-    weights: GeoScoreWeights = DEFAULT_WEIGHTS,
-) -> float:
-    """Weighted composite in [0, 1]."""
-    mention_component = 1.0 if brand_mentioned else 0.0
-    position_component = mention_position if (brand_mentioned and mention_position is not None) else 0.0
-    sentiment_c = _clamp01(sentiment)
-    accuracy_c = _clamp01(factual_accuracy)
-    score = (
-        weights.brand_mentioned * mention_component
-        + weights.mention_position * position_component
-        + weights.sentiment * sentiment_c
-        + weights.factual_accuracy * accuracy_c
-    )
-    return round(_clamp01(score), 4)
-
-
-def _clamp01(value: float) -> float:
-    return max(0.0, min(1.0, float(value)))
-
-
-def _build_judge_user_prompt(
-    *,
-    prompt_text: str,
-    response_text: str,
-    registry: dict[str, Any],
-) -> str:
-    claims = "\n".join(f"- {c}" for c in registry.get("approved_claims", []))
-    disallowed = "\n".join(f"- {c}" for c in registry.get("disallowed_claims", []))
-    return f"""BRAND: {registry.get("brand_name")} ({registry.get("website")})
-
-VERIFIED FACTS:
-{claims}
-
-DISALLOWED CLAIMS (must score factual_accuracy near 0 if asserted):
-{disallowed}
-
-USER PROMPT:
-{prompt_text}
-
-AI RESPONSE:
-{response_text}
-"""
-
-
-def _parse_llm_json(text: str) -> dict[str, Any]:
-    text = text.strip()
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        match = re.search(r"\{.*\}", text, flags=re.DOTALL)
-        if not match:
-            raise
-        return json.loads(match.group(0))
-
-
-def _llm_soft_scores(
-    *,
-    prompt_text: str,
-    response_text: str,
-    registry: dict[str, Any],
-    completer: LlmCompleter,
-    model_name: str,
-) -> tuple[float, float, dict[str, Any]]:
-    user_prompt = _build_judge_user_prompt(
-        prompt_text=prompt_text,
-        response_text=response_text,
-        registry=registry,
-    )
-    result = completer.complete(user_prompt, system=JUDGE_SYSTEM_PROMPT)
-    raw_text = getattr(result, "text", "") or ""
-    parsed = _parse_llm_json(raw_text)
-    sentiment = _clamp01(float(parsed.get("sentiment", 0.5)))
-    factual_accuracy = _clamp01(float(parsed.get("factual_accuracy", 0.5)))
-    details = {
-        "recommendation_rank": parsed.get("recommendation_rank"),
-        "notes": parsed.get("notes", ""),
-        "llm_tokens_in": getattr(result, "tokens_in", None),
-        "llm_tokens_out": getattr(result, "tokens_out", None),
-        "llm_cost_usd": getattr(result, "cost_usd", None),
-        "judge_model": model_name,
-    }
-    return sentiment, factual_accuracy, details
+    """Back-compat wrapper around inclusion scorer."""
+    registry = None
+    if aliases is not None:
+        registry = {
+            "brand_aliases": aliases,
+            "brand_name": aliases[0] if aliases else "",
+            "product_specs": {},
+        }
+    inc = score_inclusion(response_text, registry=registry)
+    position = None
+    if inc.char_offset is not None and response_text:
+        denom = max(len(response_text) - 1, 1)
+        position = max(0.0, min(1.0, 1.0 - (inc.char_offset / denom)))
+    return BrandMention(inc.brand_mentioned, inc.alias, inc.char_offset, position)
 
 
 def judge_response(
@@ -202,61 +99,114 @@ def judge_response(
     response_text: str,
     prompt_text: str = "",
     completer: LlmCompleter | None = None,
+    accuracy_completer: LlmCompleter | None = None,
+    sentiment_completer: LlmCompleter | None = None,
     settings: Settings | None = None,
     weights: GeoScoreWeights = DEFAULT_WEIGHTS,
     registry: dict[str, Any] | None = None,
     skip_llm: bool = False,
 ) -> JudgeResult:
-    """Score one response. When skip_llm=True, soft scores default to neutral 0.5."""
+    """Score one response with PDF component scorers."""
     cfg = settings or get_settings()
     registry = registry or load_truth_registry()
-    aliases = list(registry.get("brand_aliases", []))
 
-    mention = detect_brand_mention(response_text, aliases=aliases)
+    inclusion = score_inclusion(response_text, registry=registry)
+    rank = score_rank(response_text, inclusion=inclusion, registry=registry)
+    citation = score_citation(response_text, registry=registry)
+
+    acc_c = accuracy_completer
+    sent_c = sentiment_completer
     model_name = "heuristic-only"
 
-    if skip_llm or not response_text.strip():
-        sentiment = 0.5
-        factual_accuracy = 0.5
-        details: dict[str, Any] = {
-            "mode": "heuristic_only",
-            "alias_matched": mention.alias,
-            "char_offset": mention.char_offset,
-        }
-    else:
-        if completer is None:
-            from backend.agents.prompt_runner.adapters.openai_adapter import OpenAIAdapter
+    if not skip_llm and response_text.strip():
+        if completer is None and acc_c is None:
+            # PDF prefers Gemini Flash for accuracy judge
+            from backend.agents.prompt_runner.adapters.gemini_adapter import GeminiAdapter
 
-            completer = OpenAIAdapter(cfg)
-        model_name = getattr(completer, "_model", cfg.openai_model)
-        sentiment, factual_accuracy, llm_details = _llm_soft_scores(
-            prompt_text=prompt_text,
-            response_text=response_text,
-            registry=registry,
-            completer=completer,
-            model_name=model_name,
-        )
-        details = {
-            "mode": "llm_judge",
-            "alias_matched": mention.alias,
-            "char_offset": mention.char_offset,
-            **llm_details,
-        }
+            acc_c = GeminiAdapter(cfg)
+        if sent_c is None:
+            if completer is not None:
+                sent_c = completer
+            else:
+                from backend.agents.prompt_runner.adapters.openai_adapter import OpenAIAdapter
 
-    geo = compute_geo_score(
-        brand_mentioned=mention.mentioned,
-        mention_position=mention.position_score,
-        sentiment=sentiment,
-        factual_accuracy=factual_accuracy,
+                sent_c = OpenAIAdapter(cfg)
+        if acc_c is None:
+            acc_c = sent_c
+        model_name = getattr(acc_c, "_model", None) or getattr(sent_c, "_model", cfg.gemini_model)
+
+    accuracy = score_accuracy(
+        response_text=response_text,
+        prompt_text=prompt_text,
+        completer=acc_c,
+        registry=registry,
+        skip_llm=skip_llm,
+        brand_mentioned=inclusion.brand_mentioned,
+    )
+    sentiment = score_sentiment(
+        response_text=response_text,
+        prompt_text=prompt_text,
+        completer=sent_c,
+        skip_llm=skip_llm,
+        brand_mentioned=inclusion.brand_mentioned,
+    )
+
+    composite = compute_geo_score(
+        inclusion=inclusion.score,
+        rank=rank.score,
+        accuracy=accuracy.score,
+        citation=citation.score,
+        sentiment=sentiment.score,
         weights=weights,
     )
+
+    mention_position = None
+    if inclusion.char_offset is not None and response_text:
+        denom = max(len(response_text) - 1, 1)
+        mention_position = max(0.0, min(1.0, 1.0 - (inclusion.char_offset / denom)))
+
+    details: dict[str, Any] = {
+        "mode": "heuristic_only" if skip_llm else "llm_judge",
+        "inclusion_tier": inclusion.tier,
+        "alias_matched": inclusion.alias,
+        "char_offset": inclusion.char_offset,
+        "rank": {
+            "list_position": rank.list_position,
+            "prominence_bonus": rank.prominence_bonus,
+            **rank.details,
+        },
+        "citation": {
+            "urls": citation.urls,
+            "owned": citation.owned,
+            "earned": citation.earned,
+            "third_party": citation.third_party,
+        },
+        "accuracy_claims": accuracy.claims,
+        "accuracy_notes": accuracy.notes,
+        "sentiment_framing": sentiment.framing,
+        "sentiment_evidence": sentiment.evidence_phrases,
+        "sentiment_notes": sentiment.notes,
+        "weights": {
+            "inclusion": weights.inclusion,
+            "rank": weights.rank,
+            "accuracy": weights.accuracy,
+            "citation": weights.citation,
+            "sentiment": weights.sentiment,
+        },
+    }
+
     return JudgeResult(
-        brand_mentioned=mention.mentioned,
-        mention_position=mention.position_score,
-        sentiment=sentiment,
-        factual_accuracy=factual_accuracy,
-        geo_score=geo,
-        judge_model=model_name,
+        inclusion_score=inclusion.score,
+        rank_score=rank.score,
+        accuracy_score=accuracy.score,
+        citation_score=citation.score,
+        sentiment_score=sentiment.score,
+        geo_score=composite.geo_score,
+        brand_mentioned=inclusion.brand_mentioned,
+        mention_position=mention_position,
+        sentiment=sentiment.score / 100.0,
+        factual_accuracy=accuracy.score / 100.0,
+        judge_model=model_name if not skip_llm else "heuristic-only",
         details=details,
     )
 

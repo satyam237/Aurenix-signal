@@ -2,6 +2,23 @@
 
 Runs `backend.scheduler.cron_runner --force` on a schedule via **Cloud Run Jobs** + **Cloud Scheduler**. This uses the existing Phase 1 pipeline (concurrent runner + brand grounding + Supabase persistence).
 
+## Local cron (no GCP)
+
+For T-08 without Cloud Scheduler:
+
+```bash
+chmod +x scripts/run_daily_local.sh
+./scripts/run_daily_local.sh              # pipeline --force + heuristic score backfill
+./scripts/run_daily_local.sh --llm        # LLM accuracy/sentiment judges
+./scripts/run_daily_local.sh --score-only # scores only
+```
+
+Optional macOS/Linux crontab (daily 6 AM UTC):
+
+```cron
+0 6 * * * cd /path/to/GEO-Ranker-Signal-15June && ./scripts/run_daily_local.sh >> data/runs/cron_local.log 2>&1
+```
+
 ## Why not Vertex AI / Model Garden?
 
 Vertex AI has no ongoing free tier for inference. This job calls **OpenAI** and **Gemini APIs** directly (same as local runs). GCP only hosts the cron container.

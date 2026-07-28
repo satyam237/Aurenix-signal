@@ -17,21 +17,23 @@ def fetch_unscored_raw_runs(
     *,
     limit: int = 100,
     settings: Settings | None = None,
+    rescore: bool = False,
 ) -> list[dict[str, Any]]:
-    """Return successful raw_runs that do not yet have a scores row."""
+    """Return successful raw_runs. When rescore=False, skip rows that already have scores."""
     client = get_supabase_client(settings)
-    # Fetch recent successful runs, then filter out ones already scored.
     runs_resp = (
         client.table("raw_runs")
         .select("id,prompt_id,engine,model,response_text,status,created_at")
         .eq("status", "success")
         .order("created_at", desc=True)
-        .limit(limit * 3)
+        .limit(limit if rescore else limit * 3)
         .execute()
     )
     runs = runs_resp.data or []
     if not runs:
         return []
+    if rescore:
+        return runs[:limit]
 
     scored_resp = (
         client.table("scores")
@@ -86,10 +88,11 @@ def run_judge_pipeline(
     weights: GeoScoreWeights = DEFAULT_WEIGHTS,
     skip_llm: bool = False,
     dry_run: bool = False,
+    rescore: bool = False,
 ) -> dict[str, Any]:
-    """Score unscored raw_runs and upsert into scores."""
+    """Score raw_runs and upsert into scores."""
     cfg = settings or get_settings()
-    runs = fetch_unscored_raw_runs(limit=limit, settings=cfg)
+    runs = fetch_unscored_raw_runs(limit=limit, settings=cfg, rescore=rescore)
     scored = 0
     failures = 0
     results: list[dict[str, Any]] = []
@@ -110,6 +113,7 @@ def run_judge_pipeline(
                     "raw_run_id": run["id"],
                     "prompt_id": run.get("prompt_id"),
                     "geo_score": judgment.geo_score,
+                    "inclusion_score": judgment.inclusion_score,
                     "brand_mentioned": judgment.brand_mentioned,
                 }
             )

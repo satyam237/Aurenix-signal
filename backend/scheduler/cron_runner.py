@@ -38,3 +38,9 @@ def main(force: bool = False) -> int:
 if __name__ == "__main__":
     force_flag = "--force" in sys.argv
     raise SystemExit(main(force=force_flag))
+
+
+def main_cli() -> None:
+    """Console-script entry for `aurenix-cron`."""
+    force_flag = "--force" in sys.argv
+    raise SystemExit(main(force=force_flag))
