@@ -24,6 +24,8 @@ REQUIRED_PATHS = [
     "backend/scheduler/cron_runner.py",
     "dashboard/health_app.py",
     "scripts/seed_supabase.py",
+    "scripts/apply_schema.py",
+    "scripts/setup_supabase.sh",
     "scripts/test_api_keys.py",
     "scripts/check_ready.py",
     "scripts/bulk_prompt_test.py",
@@ -53,11 +55,24 @@ def check_supabase_connection() -> tuple[bool, str]:
     if not settings.supabase_url or not settings.supabase_service_role_key:
         return False, "SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY not set in .env"
 
+    required_tables = ("prompts", "run_batches", "raw_runs", "brand_config", "scores")
     try:
         client = get_supabase_client(settings)
-        result = client.table("prompts").select("id", count="exact").limit(1).execute()
-        count = result.count if result.count is not None else len(result.data)
-        return True, f"Connected — prompts table accessible (sample count={count})"
+        missing: list[str] = []
+        counts: list[str] = []
+        for table in required_tables:
+            try:
+                result = client.table(table).select("id", count="exact").limit(1).execute()
+                count = result.count if result.count is not None else len(result.data)
+                counts.append(f"{table}={count}")
+            except Exception as exc:
+                if "PGRST205" in str(exc) or "Could not find the table" in str(exc):
+                    missing.append(table)
+                else:
+                    raise
+        if missing:
+            return False, f"Schema incomplete — missing tables: {', '.join(missing)}"
+        return True, f"Connected — tables OK ({', '.join(counts)})"
     except Exception as exc:
         return False, f"Supabase connection failed: {exc}"
 
@@ -95,9 +110,8 @@ def main() -> int:
         print(f"OK — {msg}")
     else:
         print(f"WARN — {msg}")
-        print(
-            "      Apply supabase/migrations/001_initial_schema.sql then run scripts/seed_supabase.py"
-        )
+        print("      Run: python scripts/apply_schema.py --print-sql")
+        print("      Then: python scripts/seed_supabase.py")
 
     print("\nRun readiness check: python scripts/check_ready.py")
     print("Run unit tests: pytest -q")

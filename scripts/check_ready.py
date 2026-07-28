@@ -55,6 +55,16 @@ def main() -> int:
     if settings.supabase_url and settings.supabase_service_role_key:
         print(f"  SUPABASE_URL       set ({settings.supabase_url})")
         print(f"  SERVICE_ROLE_KEY   set ({_mask(settings.supabase_service_role_key)})")
+        from backend.shared.supabase_keys import validate_service_role_key
+
+        key_error = validate_service_role_key(settings.supabase_service_role_key)
+        if key_error:
+            print(f"  KEY TYPE           WRONG — {key_error}")
+            ready_for_pipeline = False
+        elif settings.supabase_service_role_key.startswith("sb_secret_"):
+            print("  KEY TYPE           secret (sb_secret_)")
+        elif settings.supabase_service_role_key.startswith("eyJ"):
+            print("  KEY TYPE           legacy service_role JWT")
     else:
         print("  SUPABASE_*         not set — bulk local tests still work")
         ready_for_pipeline = False
@@ -80,10 +90,8 @@ def main() -> int:
     print("  python scripts/bulk_prompt_test.py")
 
     if not ready_for_pipeline:
-        print("\nFor Supabase pipeline runs, also set SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY,")
-        print("apply supabase/migrations/001_initial_schema.sql, then:")
-        print("  python scripts/seed_supabase.py")
-        print("  python -m backend.agents.prompt_runner.pipeline --limit 3")
+        print("\nFor Supabase pipeline runs, fix SUPABASE_* keys if needed, apply schema, then:")
+        print("  bash scripts/setup_supabase.sh")
 
     return 0
 

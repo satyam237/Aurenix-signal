@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     supabase_url: str = ""
     supabase_service_role_key: str = ""
+    supabase_db_password: str = ""
 
     openai_model: str = "gpt-5-mini"
     gemini_model: str = "gemini-3-flash-preview"
