@@ -123,8 +123,8 @@ Internal coupling to know about:
 
 - [x] Apply Supabase schema 001 on `wjfxtmjjwezsamgiktzf`
 - [x] Seed + pipeline smoke (`verify_phase1` OK; smoke batch success=4)
-- [ ] Apply migration `002_scores_columns.sql` (GEO Score columns) — paste in SQL editor or set `SUPABASE_DB_PASSWORD`
-- [ ] Install gcloud + deploy cron — gcloud installed; need `gcloud auth login` + `./deploy/gcp_deploy.sh all`
+- [x] Apply migration `002_scores_columns.sql` (GEO Score columns)
+- [ ] GCP cron deploy — project `aurenix-signal-mvp` created; **billing account linked but closed** (`billingEnabled: false`). Re-open/activate billing, then `export GCP_PROJECT_ID=aurenix-signal-mvp && ./deploy/gcp_deploy.sh all`
 - [ ] `restructure/signal-mvp` → org `main` merge pending review.
 - [ ] Phase 1 exit criteria not yet proven in production (daily cron).
 - [ ] Week-0 manual baseline CSV not filled in.

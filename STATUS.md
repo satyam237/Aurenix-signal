@@ -1,52 +1,45 @@
 # Project Status — AureniX Signal
 
-_Last updated: 2026-07-28_
+_Last updated: 2026-07-28 (late)_
 
 > Snapshot only. The living work plan, progress checkboxes, work log, and decisions are in [`PLAN.md`](PLAN.md) — update that file as work progresses.
 
 ## Summary
 
-Phases 0–1 are **live on Supabase** (seeded + pipeline smoke succeeding). Phase 2 Response Judge + GEO Score **code is in** (migration 002 pending apply). GCP cron needs `gcloud auth login` + project id.
+Phases 0–1 are **live**. Phase 2 Response Judge is **code-complete and scoring in Supabase**. GCP project `aurenix-signal-mvp` exists under `satyamj.work@gmail.com`; **billing must be linked** before Cloud Run cron deploy.
 
 ## Current state
 
 | Item | Status |
 |------|--------|
-| Active branch | `restructure/signal-mvp` |
+| Active branch | `restructure/signal-mvp` (pushed to org + origin) |
 | Test suite | 32/32 passing |
-| API keys in `.env` | OpenAI + Gemini + Supabase service role configured |
-| Supabase project `wjfxtmjjwezsamgiktzf` | **Resumed / live** |
-| Supabase schema (001) | Applied — 5 tables present, prompts seeded (25) |
-| Migration 002 (scores GEO columns) | **Pending** — paste `supabase/migrations/002_scores_columns.sql` in SQL editor |
-| Pipeline smoke | OK — batch success=4 failure=0 (~$0.008) |
-| GCP cron deploy | gcloud installed; **auth + deploy pending** |
+| Supabase `wjfxtmjjwezsamgiktzf` | Live — schema 001+002, seeded, pipeline smoke OK |
+| Scores table | 8/8 raw_runs scored (heuristic), avg GEO ~0.76 |
+| GCP account | `satyamj.work@gmail.com` |
+| GCP project | `aurenix-signal-mvp` |
+| GCP billing | **Not linked** — blocks Cloud Run / Scheduler / Secret Manager |
+| GCP cron | Pending billing → `./deploy/gcp_deploy.sh all` |
 
-## Immediate manual steps
+## Immediate manual step
 
-1. **Apply migration 002** — open [SQL editor](https://supabase.com/dashboard/project/wjfxtmjjwezsamgiktzf/sql/new), paste `supabase/migrations/002_scores_columns.sql`, Run.
-2. **GCP auth** — `gcloud auth login` then `export GCP_PROJECT_ID=...` and `./deploy/gcp_deploy.sh all`
+1. Link billing on [aurenix-signal-mvp](https://console.cloud.google.com/billing/linkedaccount?project=aurenix-signal-mvp) (free trial / card required by GCP even for free-tier services).
+2. Then: `export GCP_PROJECT_ID=aurenix-signal-mvp && ./deploy/gcp_deploy.sh all && ./deploy/gcp_deploy.sh run`
 
 ## Phase progress
 
 | Phase | Focus | Status |
 |-------|-------|--------|
-| 0 | Baseline, Truth Registry, Supabase schema, monorepo scaffold | ✅ Done |
-| 1 | Prompt Runner — automated daily runs → Supabase | ✅ Live (cron deploy pending) |
-| 2 | Response Judge + GEO Score | 🚧 Code done; migration 002 apply pending |
-| 3 | GEO Dashboard MVP | ⏳ Not started |
+| 0 | Baseline, Truth Registry, schema, scaffold | ✅ Done |
+| 1 | Prompt Runner → Supabase | ✅ Live (cron pending billing) |
+| 2 | Response Judge + GEO Score | ✅ Code + backfill done |
+| 3 | GEO Dashboard MVP | ⏳ Next |
 | 4 | GEO Recommender + before/after loop | ⏳ Not started |
-
-## What's new (Jul 28)
-
-- Response Judge agent (`backend/agents/response_judge/`) with brand-mention heuristics + LLM soft scores + composite GEO Score
-- Migration `002_scores_columns.sql` + `scripts/backfill_scores.py`
-- Local heuristic backfill over `data/runs` artifacts
-- `scripts/apply_schema.py` applies all migrations in order; `verify_phase1` fixed for `brand_config.brand_id`
 
 ## Next steps
 
-- [ ] Paste/run migration 002 on live Supabase
-- [ ] `python scripts/backfill_scores.py --supabase --skip-llm` (then LLM judge with care)
-- [ ] Deploy GCP cron via `./deploy/gcp_deploy.sh all`
-- [ ] Confirm Phase 1 exit criteria (50+ runs/day, >95% success)
+- [ ] Link GCP billing → deploy + trigger cron once
+- [ ] Confirm Phase 1 exit criteria after scheduled runs (50+/day, >95% success)
+- [ ] Optional: LLM judge backfill (`python scripts/backfill_scores.py --supabase --limit 8`) — costs API
+- [ ] Begin Phase 3: GEO Dashboard MVP
 - [ ] Merge `restructure/signal-mvp` into org `main`
