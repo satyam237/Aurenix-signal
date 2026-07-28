@@ -37,7 +37,7 @@
 - [x] Schema apply tooling — `scripts/apply_schema.py`, `scripts/setup_supabase.sh`
 - [x] GCP deploy assets — `Dockerfile`, `deploy/gcp_deploy.sh`, `deploy/README.md`
 - [x] **Schema applied on live Supabase project** (`wjfxtmjjwezsamgiktzf`)
-- [ ] **GCP cron deployed** ← `gcloud auth login` + `./deploy/gcp_deploy.sh all`
+- [ ] **GCP cron deployed** ← reopen billing on `aurenix-signal-mvp`, then `./deploy/gcp_deploy.sh all`
 - [ ] **Exit criteria confirmed in production:** 50+ runs/day, >95% success rate, results queryable in `raw_runs`
 
 ### Phase 1.5 — Concurrency & brand grounding (added scope) ✅ COMPLETE
@@ -69,9 +69,9 @@
 
 ### 2026-07-28 — Productionize Phase 1 + start Phase 2
 - Committed/pushed Jul 13 docs, Supabase tooling, and GCP deploy assets to `org` + `origin` on `restructure/signal-mvp`.
-- Supabase project `wjfxtmjjwezsamgiktzf` resumed; verified 001 tables + seed (25 prompts). Pipeline smoke: 4/4 success (~$0.008).
+- Supabase project `wjfxtmjjwezsamgiktzf` resumed; verified 001+002 tables + seed (25 prompts). Pipeline smoke: 4/4 success (~$0.008). Supabase score backfill: 8/8 heuristic GEO scores (avg ~0.76).
 - Built Response Judge (`backend/agents/response_judge/`), migration `002_scores_columns.sql`, `scripts/backfill_scores.py`; local heuristic backfill scored 50 bulk rows. Suite now 32 tests.
-- **Blocked on:** paste/run migration 002 in SQL editor (no `SUPABASE_DB_PASSWORD`; `db.*.supabase.co` DNS not resolving yet). GCP: gcloud installed, auth/deploy pending.
+- GCP: authenticated as `satyamj.work@gmail.com`; created project `aurenix-signal-mvp`. Billing account `01930E-122967-3535C4` linked but **closed** (`billingEnabled: false`) — Cloud Run deploy blocked until billing is reopened/activated.
 
 ### 2026-07-13 (evening) — Supabase setup tooling + GCP cron deploy assets
 - Added `scripts/apply_schema.py` (SQL editor instructions, optional `--apply` via `SUPABASE_DB_PASSWORD`), `scripts/setup_supabase.sh` (schema check → seed → pipeline smoke).
