@@ -1,0 +1,84 @@
+{
+  "brand_id": "nautikal",
+  "brand_name": "The Nautikal",
+  "website": "https://www.thenautikal.com",
+  "approved_claims": [
+    "The Nautikal sells curated cruise essentials kits and individual cruise accessories.",
+    "Product lines include Cruise Essentials 5, Essential 7, and Ultimate 10 bundles.",
+    "Kits are available in Royal + Celebrity edition and Multi-Line edition.",
+    "Royal + Celebrity edition includes cruise-line-compatible luggage tags and cruise-approved power strip.",
+    "Multi-Line edition supports MSC, Norwegian, Carnival, Princess, Virgin Voyages, and other major lines.",
+    "Common kit items include magnetic cabin hooks, cruise luggage tags, premium lanyards, towel bands, and cruise-safe charging units.",
+    "Customers can build custom bundles of at least three items on thenautikal.com.",
+    "The Nautikal products are designed for compact cruise cabins and onboard use.",
+    "Ultimate 10 is the most comprehensive kit with ten accessories.",
+    "Essential 7 is described as the most popular cruise essentials kit."
+  ],
+  "disallowed_claims": [
+    "The Nautikal operates cruise ships or sells cruise vacation packages.",
+    "The Nautikal power strips are approved by all cruise lines without exception.",
+    "The Nautikal is owned by or affiliated with Royal Caribbean, Carnival, or any cruise line.",
+    "The Nautikal guarantees specific embarkation or boarding outcomes.",
+    "All Nautikal products are TSA-approved for air travel in all countries."
+  ],
+  "product_specs": {
+    "cruise_essentials_5": {
+      "name": "Cruise Essentials 5 Starter Kit",
+      "url": "https://www.thenautikal.com/products/cruise-essentials-5",
+      "items": [
+        "Magnetic Hooks, Set of 4",
+        "Cruise Luggage Tags, Set of 4",
+        "Premium Lanyards, Set of 2",
+        "Towel Bands, Set of 4",
+        "Cruise-Safe Charging Unit, 1"
+      ],
+      "editions": ["Royal + Celebrity", "Multi-Line"]
+    },
+    "cruise_essentials_7": {
+      "name": "Cruise Essentials 7 Bundle",
+      "url": "https://www.thenautikal.com/products/cruise-essentials-7",
+      "items_count": 7,
+      "editions": ["Royal + Celebrity", "Multi-Line"]
+    },
+    "ultimate_10": {
+      "name": "Ultimate 10 Cruise Essentials Kit",
+      "url": "https://www.thenautikal.com/products/ultimate-10-cruise-essentials",
+      "items_count": 10,
+      "editions": ["Royal + Celebrity", "Multi-Line"]
+    },
+    "custom_bundle": {
+      "minimum_items": 3,
+      "description": "Build-your-own bundle with at least three items"
+    }
+  },
+  "policy_facts": {
+    "shipping": "Refer to thenautikal.com shipping policy page for current rates and regions.",
+    "returns": "Refer to thenautikal.com returns policy page for eligibility and window.",
+    "warranty": "Product-specific warranty details listed on individual product pages."
+  },
+  "canonical_urls": [
+    "https://www.thenautikal.com",
+    "https://www.thenautikal.com/products/cruise-essentials-5",
+    "https://www.thenautikal.com/products/cruise-essentials-7",
+    "https://www.thenautikal.com/products/ultimate-10-cruise-essentials"
+  ],
+  "brand_aliases": [
+    "The Nautikal",
+    "Nautikal",
+    "thenautikal.com",
+    "www.thenautikal.com"
+  ],
+  "supported_cruise_lines": [
+    "Royal Caribbean International",
+    "Celebrity Cruises",
+    "Carnival",
+    "Princess Cruises",
+    "Norwegian Cruise Line",
+    "MSC Cruises",
+    "Virgin Voyages",
+    "Disney Cruise Line",
+    "Holland America Line",
+    "Costa",
+    "Cunard"
+  ]
+}

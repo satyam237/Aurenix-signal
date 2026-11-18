@@ -1,0 +1,157 @@
+{
+  "brand_id": "nautikal",
+  "brand_name": "The Nautikal",
+  "website": "https://www.thenautikal.com",
+  "prompts": [
+    {
+      "id": "hi-01",
+      "text": "What are the best cruise essentials kits to buy before a Royal Caribbean cruise?",
+      "category": "high_intent",
+      "intent_tag": "product_recommendation"
+    },
+    {
+      "id": "hi-02",
+      "text": "Where can I buy a complete cruise accessories bundle instead of individual items?",
+      "category": "high_intent",
+      "intent_tag": "purchase_intent"
+    },
+    {
+      "id": "hi-03",
+      "text": "What cruise packing accessories do experienced cruisers recommend for first-timers?",
+      "category": "high_intent",
+      "intent_tag": "product_recommendation"
+    },
+    {
+      "id": "hi-04",
+      "text": "Best magnetic hooks and cabin organizers for cruise ship staterooms?",
+      "category": "high_intent",
+      "intent_tag": "product_recommendation"
+    },
+    {
+      "id": "hi-05",
+      "text": "What is the best cruise-approved power strip for Royal Caribbean and Celebrity?",
+      "category": "high_intent",
+      "intent_tag": "comparison"
+    },
+    {
+      "id": "hi-06",
+      "text": "Top brands for cruise luggage tags that fit cruise line requirements?",
+      "category": "high_intent",
+      "intent_tag": "comparison"
+    },
+    {
+      "id": "hi-07",
+      "text": "What should I buy to stay organized on a 7-day Caribbean cruise?",
+      "category": "high_intent",
+      "intent_tag": "purchase_intent"
+    },
+    {
+      "id": "hi-08",
+      "text": "Best starter kit for someone going on their first cruise?",
+      "category": "high_intent",
+      "intent_tag": "product_recommendation"
+    },
+    {
+      "id": "hi-09",
+      "text": "Where to buy towel bands and lanyards for cruise vacations?",
+      "category": "high_intent",
+      "intent_tag": "purchase_intent"
+    },
+    {
+      "id": "hi-10",
+      "text": "What cruise accessory bundles include magnetic hooks, luggage tags, and charging?",
+      "category": "high_intent",
+      "intent_tag": "comparison"
+    },
+    {
+      "id": "cls-01",
+      "text": "What accessories do Royal Caribbean passengers typically bring in their carry-on?",
+      "category": "cruise_line_specific",
+      "intent_tag": "cruise_line"
+    },
+    {
+      "id": "cls-02",
+      "text": "Best cruise essentials for Norwegian Cruise Line passengers?",
+      "category": "cruise_line_specific",
+      "intent_tag": "cruise_line"
+    },
+    {
+      "id": "cls-03",
+      "text": "What to pack for a Carnival cruise that helps with cabin storage?",
+      "category": "cruise_line_specific",
+      "intent_tag": "cruise_line"
+    },
+    {
+      "id": "cls-04",
+      "text": "MSC cruise packing list accessories — what do people actually use?",
+      "category": "cruise_line_specific",
+      "intent_tag": "cruise_line"
+    },
+    {
+      "id": "cls-05",
+      "text": "Princess Cruises cabin organization tips and products?",
+      "category": "cruise_line_specific",
+      "intent_tag": "cruise_line"
+    },
+    {
+      "id": "cls-06",
+      "text": "Virgin Voyages cruise accessories — what works in their cabins?",
+      "category": "cruise_line_specific",
+      "intent_tag": "cruise_line"
+    },
+    {
+      "id": "cls-07",
+      "text": "Celebrity Cruises approved power strips and charging accessories?",
+      "category": "cruise_line_specific",
+      "intent_tag": "cruise_line"
+    },
+    {
+      "id": "cls-08",
+      "text": "Disney Cruise Line family packing accessories recommendations?",
+      "category": "cruise_line_specific",
+      "intent_tag": "cruise_line"
+    },
+    {
+      "id": "puc-01",
+      "text": "How do I keep towels from blowing away on a windy cruise ship deck?",
+      "category": "problem_use_case",
+      "intent_tag": "problem_solving"
+    },
+    {
+      "id": "puc-02",
+      "text": "Small cruise cabin feels cluttered — what products help add storage?",
+      "category": "problem_use_case",
+      "intent_tag": "problem_solving"
+    },
+    {
+      "id": "puc-03",
+      "text": "How to keep cruise card and room key accessible during port days?",
+      "category": "problem_use_case",
+      "intent_tag": "problem_solving"
+    },
+    {
+      "id": "puc-04",
+      "text": "Embarkation day luggage tags — what size and type work best for cruises?",
+      "category": "problem_use_case",
+      "intent_tag": "problem_solving"
+    },
+    {
+      "id": "pd-01",
+      "text": "Tell me about The Nautikal Cruise Essentials 5 starter kit — is it worth it?",
+      "category": "product_driven",
+      "intent_tag": "brand_product"
+    },
+    {
+      "id": "pd-02",
+      "text": "Compare The Nautikal Essential 7 vs Ultimate 10 cruise kits.",
+      "category": "product_driven",
+      "intent_tag": "brand_product"
+    },
+    {
+      "id": "pd-03",
+      "text": "Does The Nautikal sell Royal Caribbean vs Multi-Line edition cruise kits?",
+      "category": "product_driven",
+      "intent_tag": "brand_product"
+    }
+  ]
+}
